@@ -963,6 +963,50 @@ button {
 
 .login-divider a:hover { text-decoration: underline; }
 
+/* ── Separador "ou" ── */
+.login-or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0;
+  color: var(--faint);
+  font-size: 11.5px;
+}
+.login-or::before,
+.login-or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* ── Botão Google ── */
+.btn-google {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+  font-family: inherit;
+  cursor: pointer;
+  transition: background .15s, border-color .15s;
+  margin-bottom: 4px;
+}
+.btn-google:hover { background: var(--surface-2); border-color: var(--muted); }
+
+.btn-google-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
 /* ─── Campo de senha com botão de visualizar ──────────────── */
 .input-password-wrap {
   position: relative;

@@ -1,3 +1,5 @@
+import re
+
 from flask import Blueprint, jsonify, request, current_app
 
 from extensions import db
@@ -6,41 +8,90 @@ from services.auth_service import gerar_token
 
 auth_bp = Blueprint("auth", __name__)
 
+# Regex básica de email (complementa email-validator se disponível)
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]{2,}$")
+
+# Comprimento mínimo e máximo de senha
+_SENHA_MIN = 8
+_SENHA_MAX = 128
+
+
+def _validar_email(email: str) -> bool:
+    """Valida formato de email. Usa email-validator se disponível."""
+    try:
+        from email_validator import validate_email, EmailNotValidError
+        validate_email(email, check_deliverability=False)
+        return True
+    except Exception:
+        return bool(_EMAIL_RE.match(email))
+
+
+def _validar_senha(senha: str) -> str | None:
+    """Retorna mensagem de erro ou None se válida."""
+    if len(senha) < _SENHA_MIN:
+        return f"Senha deve ter no mínimo {_SENHA_MIN} caracteres"
+    if len(senha) > _SENHA_MAX:
+        return f"Senha muito longa"
+    if not re.search(r"[A-Za-z]", senha):
+        return "Senha deve conter pelo menos uma letra"
+    if not re.search(r"[0-9]", senha):
+        return "Senha deve conter pelo menos um número"
+    return None
+
+
+def _emit_token(user: User) -> dict:
+    token = gerar_token(
+        user.id,
+        current_app.config["JWT_SECRET"],
+        current_app.config["JWT_EXPIRATION_HOURS"],
+    )
+    return {
+        "token":    token,
+        "id":       user.id,
+        "email":    user.email,
+        "nome":     user.nome,
+        "foto_url": user.foto_url,
+    }
+
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
-    data = request.json or {}
-    email = (data.get("email") or "").strip()
+    data  = request.get_json(silent=True) or {}
+    email = (data.get("email") or "").strip().lower()
     senha = data.get("senha") or ""
 
     if not email or not senha:
         return jsonify({"erro": "Email e senha são obrigatórios"}), 400
+    if not _validar_email(email):
+        return jsonify({"erro": "Email inválido"}), 400
+
+    erro_senha = _validar_senha(senha)
+    if erro_senha:
+        return jsonify({"erro": erro_senha}), 400
+
     if User.query.filter_by(email=email).first():
         return jsonify({"erro": "Email já cadastrado"}), 409
 
-    user = User(email=email)
+    user = User(email=email, auth_provider="email")
     user.set_senha(senha)
     db.session.add(user)
     db.session.commit()
 
-    token = gerar_token(
-        user.id,
-        current_app.config["JWT_SECRET"],
-        current_app.config["JWT_EXPIRATION_HOURS"],
-    )
-    return jsonify({"token": token, "id": user.id, "email": user.email}), 201
+    return jsonify(_emit_token(user)), 201
 
 
 @auth_bp.route("/login", methods=["POST"])
 def login():
-    data = request.json or {}
-    user = User.query.filter_by(email=data.get("email", "")).first()
-    if not user or not user.check_senha(data.get("senha", "")):
+    data  = request.get_json(silent=True) or {}
+    email = (data.get("email") or "").strip().lower()
+    senha = data.get("senha") or ""
+
+    if not email or not senha:
+        return jsonify({"erro": "Email e senha são obrigatórios"}), 400
+
+    user = User.query.filter_by(email=email).first()
+    # Mensagem genérica — não revela se o email existe
+    if not user or not user.check_senha(senha):
         return jsonify({"erro": "Credenciais inválidas"}), 401
 
-    token = gerar_token(
-        user.id,
-        current_app.config["JWT_SECRET"],
-        current_app.config["JWT_EXPIRATION_HOURS"],
-    )
-    return jsonify({"token": token, "id": user.id, "email": user.email})
+    return jsonify(_emit_token(user))

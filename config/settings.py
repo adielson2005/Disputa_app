@@ -26,15 +26,12 @@ class BaseConfig:
 
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
-    # DEV_DATABASE_URL → para quem quiser testar PostgreSQL localmente.
-    # DATABASE_URL é reservado para produção e NÃO é lido aqui.
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DEV_DATABASE_URL", "sqlite:///golapp.db"
     ).replace("postgres://", "postgresql://", 1)
-    # Em dev, aceita JWT_SECRET do .env; se ausente gera um temporário
-    # (tokens são invalidados a cada restart — OK em desenvolvimento)
     JWT_SECRET = os.environ.get("JWT_SECRET") or secrets.token_hex(32)
     SECRET_KEY = os.environ.get("SECRET_KEY") or secrets.token_hex(32)
+    GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 
 
 class ProductionConfig(BaseConfig):
@@ -54,6 +51,7 @@ class ProductionConfig(BaseConfig):
     )
     JWT_SECRET = os.environ.get("JWT_SECRET")   # None → erro em validate()
     SECRET_KEY = os.environ.get("SECRET_KEY")   # None → erro em validate()
+    GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
 
 
 class TestingConfig(BaseConfig):

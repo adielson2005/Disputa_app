@@ -27,8 +27,9 @@ async function _req(method, path, body = null, auth = false) {
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
-export const login    = (email, senha) => _req("POST", "/login",    { email, senha });
-export const register = (email, senha) => _req("POST", "/register", { email, senha });
+export const login       = (email, senha)  => _req("POST", "/login",        { email, senha });
+export const register    = (email, senha)  => _req("POST", "/register",     { email, senha });
+export const loginGoogle = (credential)    => _req("POST", "/auth/google",  { credential });
 
 // ── Campeonatos ───────────────────────────────────────────────────────────────
 // Sem user_id na URL — o backend usa o token JWT para identificar o usuário
