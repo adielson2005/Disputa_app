@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#10b981" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
+  <title>GolApp</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/camp.css">
+  <!-- Aplica tema antes do render para evitar flash -->
+  <script>
+    document.documentElement.setAttribute(
+      "data-theme",
+      localStorage.getItem("golapp-theme") || "light"
+    );
+  </script>
+</head>
+<body>
+
+  <!-- ── LOGIN ──────────────────────────────────────────────────────── -->
+  <div id="login-overlay">
+
+    <div class="login-panel-left">
+      <div class="login-left-inner">
+        <div class="login-wordmark">
+          <span class="login-wordmark-dot"></span>GolApp
+        </div>
+        <p class="login-tagline">Campeonatos organizados.<br>Resultados em tempo real.</p>
+        <div class="login-left-divider"></div>
+        <p class="login-left-caption">Gerencie times, jogos e classifica&ccedil;&atilde;o — tudo em um lugar.</p>
+      </div>
+    </div>
+
+    <div class="login-panel-right">
+
+      <div class="login-box" id="tela-login">
+        <div class="login-logo">Entrar</div>
+        <div class="login-sub">Acesse sua conta para continuar</div>
+        <div class="login-erro" id="login-erro"></div>
+        <div class="form-field">
+          <label>Email</label>
+          <input id="loginEmail" type="email" placeholder="seu@email.com">
+        </div>
+        <div class="form-field">
+          <label>Senha</label>
+          <div class="input-password-wrap">
+            <input id="loginSenha" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
+            <button type="button" class="btn-show-pass" data-target="loginSenha" aria-label="Mostrar senha">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+        <button class="btn-primary-full" id="btn-login">Entrar</button>
+        <p class="login-divider">
+          Sem conta? <a href="#" id="link-to-register">Criar conta</a>
+        </p>
+      </div>
+
+      <div class="login-box" id="tela-register" style="display:none">
+        <div class="login-logo">Criar conta</div>
+        <div class="login-sub">Preencha os dados para se cadastrar</div>
+        <div class="login-erro" id="register-erro"></div>
+        <div class="form-field">
+          <label>Email</label>
+          <input id="registerEmail" type="email" placeholder="seu@email.com">
+        </div>
+        <div class="form-field">
+          <label>Senha</label>
+          <div class="input-password-wrap">
+            <input id="registerSenha" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
+            <button type="button" class="btn-show-pass" data-target="registerSenha" aria-label="Mostrar senha">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Confirmar senha</label>
+          <div class="input-password-wrap">
+            <input id="registerConfirma" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;">
+            <button type="button" class="btn-show-pass" data-target="registerConfirma" aria-label="Mostrar senha">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+        </div>
+        <button class="btn-primary-full" id="btn-register">Criar conta</button>
+        <p class="login-divider">
+          J&aacute; tem conta? <a href="#" id="link-to-login">Entrar</a>
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ── SIDEBAR ────────────────────────────────────────────────────── -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <span class="sidebar-logo-dot"></span>
+      GolApp
+    </div>
+
+    <div class="sidebar-user" id="user-strip">
+      <span class="sidebar-user-avatar"><i class="bi bi-person-fill"></i></span>
+      <span class="sidebar-user-email" id="user-email"></span>
+      <button id="btn-logout">Sair</button>
+    </div>
+
+    <!-- ─ Menu: contexto geral ─ -->
+    <div id="menu-geral" class="sidebar-menu">
+      <nav class="sidebar-nav">
+        <div class="nav-item ativo" data-tela="dashboard">
+          <i class="bi bi-grid-fill nav-icon"></i><span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-tela="campeonatos">
+          <i class="bi bi-trophy-fill nav-icon"></i><span>Campeonatos</span>
+        </div>
+
+        <div class="sidebar-section-label">Geral</div>
+
+        <div class="nav-item" data-tela="configuracoes">
+          <i class="bi bi-sliders2 nav-icon"></i><span>Configura&ccedil;&otilde;es</span>
+        </div>
+        <div class="nav-item" data-tela="sobre">
+          <i class="bi bi-info-circle-fill nav-icon"></i><span>Sobre</span>
+        </div>
+      </nav>
+
+      <!-- Redes sociais removidas daqui — estão na página Sobre -->
+    </div>
+
+    <!-- ─ Menu: contexto campeonato ─ -->
+    <div id="menu-campeonato" class="sidebar-menu" style="display:none">
+      <div class="sidebar-ctx-header">
+        <button class="sidebar-back-btn" id="btn-voltar-geral">
+          <i class="bi bi-arrow-left"></i> Voltar
+        </button>
+        <div class="sidebar-ctx-badge" id="sidebar-ctx-modalidade"></div>
+        <div class="sidebar-ctx-name" id="sidebar-ctx-nome">&mdash;</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-item" data-tela="overview">
+          <i class="bi bi-grid-fill nav-icon"></i><span>Vis&atilde;o Geral</span>
+        </div>
+
+        <div class="sidebar-section-label">Competi&ccedil;&atilde;o</div>
+
+        <div class="nav-item" data-tela="times">
+          <i class="bi bi-people-fill nav-icon"></i><span>Times</span>
+        </div>
+        <div class="nav-item" data-tela="jogos">
+          <i class="bi bi-calendar-check-fill nav-icon"></i><span>Jogos</span>
+        </div>
+        <div class="nav-item" data-tela="classificacao">
+          <i class="bi bi-list-ol nav-icon"></i><span>Classifica&ccedil;&atilde;o</span>
+        </div>
+        <div class="nav-item" data-tela="artilharia">
+          <i class="bi bi-lightning-fill nav-icon"></i><span>Artilharia</span>
+        </div>
+
+        <div class="sidebar-section-label">An&aacute;lise</div>
+
+        <div class="nav-item" data-tela="estatisticas">
+          <i class="bi bi-graph-up-arrow nav-icon"></i><span>Estat&iacute;sticas</span>
+        </div>
+
+        <div class="sidebar-section-label">Informa&ccedil;&otilde;es</div>
+
+        <div class="nav-item" data-tela="avisos">
+          <i class="bi bi-megaphone-fill nav-icon"></i><span>Avisos</span>
+        </div>
+        <div class="nav-item" data-tela="regulamento">
+          <i class="bi bi-file-text-fill nav-icon"></i><span>Regulamento</span>
+        </div>
+        <div class="nav-item" data-tela="config-camp">
+          <i class="bi bi-sliders2 nav-icon"></i><span>Configura&ccedil;&otilde;es</span>
+        </div>
+      </nav>
+    </div>
+
+    <div class="sidebar-bottom">
+      <button class="theme-btn" id="theme-btn">
+        <i id="theme-icon" class="bi bi-moon-stars-fill"></i>
+        <span id="theme-label">Modo escuro</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── CONTENT ────────────────────────────────────────────────────── -->
+  <div class="content">
+    <div class="topbar">
+      <button class="topbar-back-btn" id="btn-topbar-voltar" style="display:none" aria-label="Voltar">
+        <i class="bi bi-arrow-left"></i>
+      </button>
+      <span class="topbar-title" id="topbar-title">Dashboard</span>
+      <div class="topbar-actions">
+        <button class="topbar-icon-btn" id="theme-btn-topbar" aria-label="Alternar tema">
+          <i id="theme-icon-topbar" class="bi bi-moon-stars-fill"></i>
+        </button>
+        <button class="topbar-icon-btn" id="btn-logout-mobile" aria-label="Sair">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- Dashboard (contexto geral) -->
+      <div id="dashboard" class="tela ativa">
+        <div class="dash-hero" id="dash-hero"></div>
+        <div class="card">
+          <div class="card-title">Meus campeonatos</div>
+          <div id="dash-lista-campeonatos" class="dash-camp-list"></div>
+        </div>
+      </div>
+
+      <!-- Campeonatos -->
+      <div id="campeonatos" class="tela">
+
+        <!-- Lista -->
+        <div class="card">
+          <div class="camp-busca-wrap">
+            <i class="bi bi-search camp-busca-icon"></i>
+            <input id="camp-busca" class="camp-busca-input" placeholder="Buscar campeonato&hellip;" autocomplete="off">
+          </div>
+          <div id="lista-campeonatos"></div>
+        </div>
+
+        <!-- FAB novo campeonato -->
+        <button class="camp-fab" id="btn-novo-campeonato" aria-label="Novo campeonato">
+          <i class="bi bi-plus-lg"></i>
+        </button>
+
+        <!-- Painel de cria&ccedil;&atilde;o (slide-in) -->
+        <div class="camp-create-panel" id="camp-create-panel" aria-hidden="true">
+
+          <div class="camp-create-header">
+            <button class="camp-create-back" id="btn-fechar-criar" aria-label="Voltar">
+              <i class="bi bi-arrow-left"></i>
+            </button>
+            <span class="camp-create-title">Novo campeonato</span>
+          </div>
+
+          <div class="camp-create-body">
+
+            <!-- Nome -->
+            <div class="cc-hero-field">
+              <input class="cc-hero-input" id="nomeCampeonato"
+                     placeholder="Nome do campeonato" autocomplete="off">
+            </div>
+
+            <!-- Esporte -->
+            <div class="cc-section">
+              <div class="cc-section-label">Esporte</div>
+              <div class="cc-pills" id="modalidade-pills">
+                <button type="button" class="cc-pill" data-value="Futebol">Futebol</button>
+                <button type="button" class="cc-pill" data-value="Futsal">Futsal</button>
+                <button type="button" class="cc-pill" data-value="Basquete">Basquete</button>
+                <button type="button" class="cc-pill" data-value="V&ocirc;lei">V&ocirc;lei</button>
+                <button type="button" class="cc-pill" data-value="Handebol">Handebol</button>
+                <button type="button" class="cc-pill" data-value="H&oacute;quei">H&oacute;quei</button>
+                <button type="button" class="cc-pill" data-value="Outro">Outro</button>
+              </div>
+            </div>
+
+            <!-- Formato -->
+            <div class="cc-section">
+              <div class="cc-section-label">Formato</div>
+              <div class="cc-pills" id="formato-pills">
+                <button type="button" class="cc-pill" data-value="Liga">
+                  <i class="bi bi-table"></i> Liga
+                </button>
+                <button type="button" class="cc-pill" data-value="Copa">
+                  <i class="bi bi-diagram-3"></i> Copa
+                </button>
+                <button type="button" class="cc-pill" data-value="Grupos">
+                  <i class="bi bi-grid-3x3-gap"></i> Grupos
+                </button>
+              </div>
+              <div class="cc-hint" id="formato-hint"></div>
+            </div>
+
+            <!-- Categoria -->
+            <div class="cc-section">
+              <div class="cc-section-label">Categoria</div>
+              <div class="cc-pills" id="categoria-pills">
+                <button type="button" class="cc-pill" data-value="Livre">Livre</button>
+                <button type="button" class="cc-pill" data-value="Profissional">Profissional</button>
+                <button type="button" class="cc-pill" data-value="Feminino">Feminino</button>
+                <button type="button" class="cc-pill" data-value="Misto">Misto</button>
+                <button type="button" class="cc-pill cc-pill-sub" data-value="Sub-20">Sub-20</button>
+                <button type="button" class="cc-pill cc-pill-sub" data-value="Sub-17">Sub-17</button>
+                <button type="button" class="cc-pill cc-pill-sub" data-value="Sub-15">Sub-15</button>
+                <button type="button" class="cc-pill cc-pill-sub" data-value="Sub-13">Sub-13</button>
+                <button type="button" class="cc-pill cc-pill-sub" data-value="Sub-11">Sub-11</button>
+              </div>
+            </div>
+
+            <!-- Configura&ccedil;&otilde;es -->
+            <div class="cc-section">
+              <div class="cc-section-label">Configura&ccedil;&otilde;es</div>
+              <div class="cc-config-list">
+                <div class="cc-config-item">
+                  <span class="cc-config-label">Dura&ccedil;&atilde;o por tempo</span>
+                  <select class="cc-config-select" id="duracaoPadrao">
+                    <option value="45">45 min</option>
+                    <option value="20">20 min</option>
+                    <option value="10">10 min</option>
+                    <option value="15">15 min</option>
+                    <option value="30">30 min</option>
+                  </select>
+                </div>
+                <div class="cc-config-item">
+                  <span class="cc-config-label">Pontos por vit&oacute;ria</span>
+                  <select class="cc-config-select" id="pontosVitoria">
+                    <option value="3">3 pontos</option>
+                    <option value="2">2 pontos</option>
+                  </select>
+                </div>
+                <div class="cc-config-item">
+                  <span class="cc-config-label">Ida e volta</span>
+                  <div class="config-row-toggle" id="toggle-ida-volta-wrap">
+                    <div class="toggle-pill"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Descri&ccedil;&atilde;o -->
+            <div class="cc-section">
+              <div class="cc-section-label">
+                Descri&ccedil;&atilde;o
+                <span class="cc-label-opt">(opcional)</span>
+              </div>
+              <input class="cc-input" id="descricaoCampeonato"
+                     placeholder="Regras, premia&ccedil;&atilde;o, detalhes&hellip;" autocomplete="off">
+            </div>
+
+          </div><!-- /.camp-create-body -->
+
+          <div class="camp-create-footer">
+            <button class="btn-primary" id="btn-criar-campeonato"
+                    style="width:100%">Criar campeonato</button>
+          </div>
+
+        </div><!-- /.camp-create-panel -->
+
+      </div>
+
+      <!-- Times -->
+      <div id="times" class="tela">
+        <div class="card">
+          <div class="card-title">Adicionar time</div>
+          <div class="form-row">
+            <div class="form-field">
+              <label>Nome do time</label>
+              <input id="nomeTime" placeholder="Ex: Flamengo">
+            </div>
+            <button class="btn-primary" id="btn-criar-time"
+                    style="align-self:flex-end">Adicionar</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Times cadastrados</div>
+          <div class="lista-times" id="lista-times-tela"></div>
+        </div>
+      </div>
+
+      <!-- Jogos -->
+      <div id="jogos" class="tela">
+        <div class="card">
+          <div class="card-title">Gerar confrontos</div>
+          <button class="btn-outline" id="btn-gerar-jogos">Gerar Round Robin</button>
+        </div>
+        <div class="card">
+          <div class="card-title">Confrontos</div>
+          <div id="jogos-list" class="jogos-list"></div>
+        </div>
+      </div>
+
+      <!-- Classificação -->
+      <div id="classificacao" class="tela">
+        <div class="card">
+          <div class="card-title">Classifica&ccedil;&atilde;o</div>
+          <table id="tabela"></table>
+        </div>
+      </div>
+
+      <!-- Visão Geral (contexto campeonato) -->
+      <div id="overview" class="tela">
+
+        <!-- Hero do campeonato -->
+        <div class="camp-hero" id="camp-hero" data-sport-icon="🏆">
+          <div class="camp-hero-top-row">
+            <span class="camp-hero-badge camp-hero-badge--nao-iniciado" id="camp-hero-badge">N&atilde;o iniciado</span>
+          </div>
+          <h1 class="camp-hero-name" id="camp-hero-nome">&mdash;</h1>
+          <div class="camp-hero-meta" id="camp-hero-meta"></div>
+        </div>
+
+        <!-- Stats -->
+        <div class="ov-stats-row" id="ov-stats-row"></div>
+
+        <!-- Grid principal -->
+        <div class="ov-grid">
+          <div class="ov-col">
+            <div class="card">
+              <div class="ov-section-title">Pr&oacute;ximos jogos</div>
+              <div id="ov-proximos"></div>
+            </div>
+            <div class="card">
+              <div class="ov-section-title">&Uacute;ltimos resultados</div>
+              <div id="ov-resultados"></div>
+            </div>
+          </div>
+          <div class="ov-col">
+            <div class="card">
+              <div class="ov-section-title">Classifica&ccedil;&atilde;o</div>
+              <div id="ov-classif-mini"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Artilharia -->
+      <div id="artilharia" class="tela">
+        <div class="card">
+          <div class="card-title">Artilharia &mdash; Gols por time</div>
+          <div id="art-lista"></div>
+        </div>
+      </div>
+
+      <!-- Avisos -->
+      <div id="avisos" class="tela">
+        <div class="card">
+          <div class="aviso-empty">
+            <i class="bi bi-megaphone"></i>
+            <p>Nenhum aviso publicado ainda.</p>
+            <sub>Em breve ser&aacute; poss&iacute;vel publicar avisos para os participantes.</sub>
+          </div>
+        </div>
+      </div>
+
+      <!-- Regulamento -->
+      <div id="regulamento" class="tela">
+        <div class="card">
+          <div class="card-title">Descri&ccedil;&atilde;o &amp; Regulamento</div>
+          <div id="reg-desc"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Par&acirc;metros do campeonato</div>
+          <div class="camp-config-info" id="reg-config"></div>
+        </div>
+      </div>
+
+      <!-- Config do campeonato -->
+      <div id="config-camp" class="tela">
+        <div class="card">
+          <div class="card-title">Sobre este campeonato</div>
+          <div class="camp-config-info" id="config-camp-info"></div>
+        </div>
+      </div>
+
+      <!-- Estatísticas -->
+      <div id="estatisticas" class="tela">
+        <div class="stats-grid" id="estat-cards"></div>
+
+        <div class="card">
+          <div class="card-title">Destaques</div>
+          <div id="estat-destaques" class="dest-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Artilharia por Time</div>
+          <div id="estat-artilharia" class="estat-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title"><i class="bi bi-square-fill" style="color:#d97706;margin-right:6px"></i>Disciplina &mdash; Cart&otilde;es</div>
+          <div id="estat-disciplina" class="estat-list"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Recordes do Campeonato</div>
+          <div id="estat-recordes" class="recorde-list"></div>
+        </div>
+      </div>
+
+      <!-- Configurações -->
+      <div id="configuracoes" class="tela">
+
+        <!-- Aparência -->
+        <div class="config-section">
+          <div class="config-section-title">Apar&ecirc;ncia</div>
+          <div class="config-list">
+            <div class="config-row" id="config-tema-row">
+              <div class="config-row-icon"><i class="bi bi-moon-stars-fill"></i></div>
+              <div class="config-row-body">
+                <div class="config-row-label">Tema escuro</div>
+              </div>
+              <button class="config-row-toggle" id="config-tema-toggle" aria-label="Alternar tema">
+                <div class="toggle-pill"></div>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Conta -->
+        <div class="config-section">
+          <div class="config-section-title">Conta</div>
+          <div class="config-list">
+            <div class="config-row" style="cursor:default">
+              <div class="config-row-icon"><i class="bi bi-person"></i></div>
+              <div class="config-row-body">
+                <div class="config-row-label">Email</div>
+              </div>
+              <span class="config-row-val" id="config-user-email">&mdash;</span>
+            </div>
+            <div class="config-row" id="config-btn-senha">
+              <div class="config-row-icon"><i class="bi bi-lock"></i></div>
+              <div class="config-row-body">
+                <div class="config-row-label">Alterar senha</div>
+              </div>
+              <i class="bi bi-chevron-right config-row-arrow"></i>
+            </div>
+            <div class="config-row config-row-danger" id="config-btn-logout">
+              <div class="config-row-icon"><i class="bi bi-box-arrow-right"></i></div>
+              <div class="config-row-body">
+                <div class="config-row-label">Sair da conta</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dados -->
+        <div class="config-section">
+          <div class="config-section-title">Dados</div>
+          <div class="config-list">
+            <div class="config-row" id="config-btn-exportar">
+              <div class="config-row-icon"><i class="bi bi-download"></i></div>
+              <div class="config-row-body">
+                <div class="config-row-label">Exportar campeonatos</div>
+                <div class="config-row-sub">Baixar como JSON</div>
+              </div>
+              <i class="bi bi-chevron-right config-row-arrow"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sobre -->
+        <div class="config-section">
+          <div class="config-section-title">Sobre</div>
+          <div class="config-list">
+            <div class="config-row" id="config-btn-sobre">
+              <div class="config-row-icon"><i class="bi bi-info-circle"></i></div>
+              <div class="config-row-body">
+                <div class="config-row-label">GolApp</div>
+                <div class="config-row-sub" id="config-versao-sub">Vers&atilde;o 1.0.0</div>
+              </div>
+              <i class="bi bi-chevron-right config-row-arrow"></i>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sobre -->
+      <div id="sobre" class="tela">
+        <div class="sobre-hero">
+          <div class="sobre-logo">&#9917;</div>
+          <div class="sobre-nome">GolApp</div>
+          <div class="sobre-versao">Vers&atilde;o 1.0.0</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">O que &eacute; o GolApp?</div>
+          <p class="sobre-desc">GolApp &eacute; uma plataforma para gerenciar campeonatos amadores e semiprofissionais. Controle times, placar em tempo real e classifica&ccedil;&atilde;o autom&aacute;tica, tudo em um s&oacute; lugar.</p>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Contato &amp; Redes</div>
+          <div class="sobre-links">
+            <a href="https://instagram.com" target="_blank" rel="noopener" class="sobre-link">
+              <i class="bi bi-instagram"></i><span>Instagram</span><i class="bi bi-box-arrow-up-right sobre-link-ext"></i>
+            </a>
+            <a href="https://twitter.com" target="_blank" rel="noopener" class="sobre-link">
+              <i class="bi bi-twitter-x"></i><span>X / Twitter</span><i class="bi bi-box-arrow-up-right sobre-link-ext"></i>
+            </a>
+            <a href="https://youtube.com" target="_blank" rel="noopener" class="sobre-link">
+              <i class="bi bi-youtube"></i><span>YouTube</span><i class="bi bi-box-arrow-up-right sobre-link-ext"></i>
+            </a>
+            <a href="https://tiktok.com" target="_blank" rel="noopener" class="sobre-link">
+              <i class="bi bi-tiktok"></i><span>TikTok</span><i class="bi bi-box-arrow-up-right sobre-link-ext"></i>
+            </a>
+            <a href="mailto:contato@golapp.com" class="sobre-link">
+              <i class="bi bi-envelope-fill"></i><span>contato@golapp.com</span><i class="bi bi-box-arrow-up-right sobre-link-ext"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Tecnologias</div>
+          <div class="sobre-tags">
+            <span class="sobre-tag">Flask</span>
+            <span class="sobre-tag">SQLite</span>
+            <span class="sobre-tag">Python</span>
+            <span class="sobre-tag">JavaScript ES Modules</span>
+            <span class="sobre-tag">Bootstrap Icons</span>
+          </div>
+        </div>
+
+        <p class="sobre-copy">&copy; 2026 GolApp. Todos os direitos reservados.</p>
+      </div>
+
+    </div><!-- /.content-area -->
+  </div><!-- /.content -->
+
+  <!-- ── BOTTOM NAV (mobile) ──────────────────────────────────────── -->
+  <nav class="bottom-nav ctx-geral" id="bottom-nav">
+    <!-- Contexto: geral -->
+    <button class="bottom-nav-item ativo ctx-geral" data-tela="dashboard">
+      <i class="bi bi-grid-fill"></i><span>Home</span>
+    </button>
+    <button class="bottom-nav-item ctx-geral" data-tela="campeonatos">
+      <i class="bi bi-trophy-fill"></i><span>Campeonatos</span>
+    </button>
+    <button class="bottom-nav-item ctx-geral" data-tela="configuracoes">
+      <i class="bi bi-sliders2"></i><span>Config.</span>
+    </button>
+    <button class="bottom-nav-item ctx-geral" data-tela="sobre">
+      <i class="bi bi-info-circle-fill"></i><span>Sobre</span>
+    </button>
+    <!-- Contexto: campeonato -->
+    <button class="bottom-nav-item ctx-camp" data-tela="overview">
+      <i class="bi bi-house-fill"></i><span>Visão Geral</span>
+    </button>
+    <button class="bottom-nav-item ctx-camp" data-tela="times">
+      <i class="bi bi-people-fill"></i><span>Times</span>
+    </button>
+    <button class="bottom-nav-item ctx-camp" data-tela="jogos">
+      <i class="bi bi-calendar-check-fill"></i><span>Jogos</span>
+    </button>
+    <button class="bottom-nav-item ctx-camp" data-tela="classificacao">
+      <i class="bi bi-list-ol"></i><span>Classif.</span>
+    </button>
+    <button class="bottom-nav-item ctx-camp" data-tela="estatisticas">
+      <i class="bi bi-graph-up-arrow"></i><span>Stats</span>
+    </button>
+  </nav>
+
+  <!-- ── MODAL PARTIDA ──────────────────────────────────────────────── -->
+  <div id="modal-jogo" class="modal">
+    <div class="modal-box">
+      <button class="modal-close" aria-label="Fechar">&#x2715;</button>
+
+      <div class="modal-teams">
+        <span class="modal-team" id="modal-time-a">&mdash;</span>
+        <div class="modal-score-area">
+          <div class="score-col">
+            <button class="btn-score" data-gol="a+">+</button>
+            <span class="score-num" id="modal-score-a">0</span>
+            <button class="btn-score" data-gol="a-">&#8722;</button>
+          </div>
+          <span class="score-sep">&ndash;</span>
+          <div class="score-col">
+            <button class="btn-score" data-gol="b+">+</button>
+            <span class="score-num" id="modal-score-b">0</span>
+            <button class="btn-score" data-gol="b-">&#8722;</button>
+          </div>
+        </div>
+        <span class="modal-team" id="modal-time-b">&mdash;</span>
+      </div>
+
+      <div class="modal-timer">
+        <div class="timer-display" id="timer-display">00:00</div>
+        <span class="status-badge-modal" id="modal-status-badge">Aguardando</span>
+      </div>
+
+      <div class="modal-duracao">
+        <span>Dura&ccedil;&atilde;o:</span>
+        <select id="modalDuracaoSelect">
+          <option value="45">45 min (Futebol)</option>
+          <option value="20">20 min (Futsal)</option>
+          <option value="10">10 min (Basquete)</option>
+          <option value="30">30 min (Handebol)</option>
+          <option value="25">25 min (H&oacute;quei)</option>
+          <option value="custom">Personalizado</option>
+        </select>
+        <input type="number" id="duracaoCustom" min="1" max="120"
+               placeholder="min" style="width:50px;display:none">
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-outline" id="btn-iniciar">Iniciar</button>
+        <button class="btn-outline" id="btn-intervalo">Intervalo</button>
+        <button class="btn-outline" id="btn-segundo">2&ordm; Tempo</button>
+        <button class="btn-outline" id="btn-encerrar">Encerrar</button>
+      </div>
+
+      <!-- Cartões -->
+      <div class="modal-cartoes">
+        <div class="modal-cartao-col">
+          <div class="modal-cartao-grupo">
+            <span class="modal-cartao-icon amarelo">&#9646;</span>
+            <button class="btn-cartao btn-cartao-sub" data-cartao="a" data-tipo="amarelo" data-delta="-1">&minus;</button>
+            <span class="modal-cartao-count" id="modal-am-a">0</span>
+            <button class="btn-cartao btn-cartao-add" data-cartao="a" data-tipo="amarelo" data-delta="1">+</button>
+          </div>
+          <div class="modal-cartao-grupo">
+            <span class="modal-cartao-icon vermelho">&#9646;</span>
+            <button class="btn-cartao btn-cartao-sub" data-cartao="a" data-tipo="vermelho" data-delta="-1">&minus;</button>
+            <span class="modal-cartao-count" id="modal-verm-a">0</span>
+            <button class="btn-cartao btn-cartao-add" data-cartao="a" data-tipo="vermelho" data-delta="1">+</button>
+          </div>
+        </div>
+        <div class="modal-cartao-label">Cart&otilde;es</div>
+        <div class="modal-cartao-col modal-cartao-col-dir">
+          <div class="modal-cartao-grupo">
+            <span class="modal-cartao-icon amarelo">&#9646;</span>
+            <button class="btn-cartao btn-cartao-sub" data-cartao="b" data-tipo="amarelo" data-delta="-1">&minus;</button>
+            <span class="modal-cartao-count" id="modal-am-b">0</span>
+            <button class="btn-cartao btn-cartao-add" data-cartao="b" data-tipo="amarelo" data-delta="1">+</button>
+          </div>
+          <div class="modal-cartao-grupo">
+            <span class="modal-cartao-icon vermelho">&#9646;</span>
+            <button class="btn-cartao btn-cartao-sub" data-cartao="b" data-tipo="vermelho" data-delta="-1">&minus;</button>
+            <span class="modal-cartao-count" id="modal-verm-b">0</span>
+            <button class="btn-cartao btn-cartao-add" data-cartao="b" data-tipo="vermelho" data-delta="1">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
