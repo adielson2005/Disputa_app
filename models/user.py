@@ -15,6 +15,10 @@ class User(TimestampMixin, SoftDeleteMixin, db.Model):
     nome        = db.Column(db.String(120), nullable=True)
     foto_url    = db.Column(db.String(512), nullable=True)
     auth_provider = db.Column(db.String(20), nullable=False, default="email")
+    # Assinatura
+    plano_ativo    = db.Column(db.Boolean, default=False, nullable=False)
+    plano_tipo     = db.Column(db.String(20), nullable=True)   # "mensal" | "anual"
+    plano_validade = db.Column(db.DateTime, nullable=True)
 
     def set_senha(self, senha: str) -> None:
         self.senha_hash = generate_password_hash(senha, method="pbkdf2:sha256:600000")

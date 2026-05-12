@@ -23,7 +23,9 @@ export async function refresh() {
   try {
     _campeonatos = await getCampeonatos();
     _render();
-  } catch (e) { console.error("Dashboard load error", e); }
+  } catch (e) {
+    if (e?.status !== 401) console.error("Dashboard load error", e);
+  }
 }
 
 function _saudacao() {

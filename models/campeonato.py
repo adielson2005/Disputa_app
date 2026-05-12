@@ -23,5 +23,11 @@ class Campeonato(TimestampMixin, SoftDeleteMixin, db.Model):
     ida_volta      = db.Column(db.Boolean,  default=False, nullable=False)
     formato        = db.Column(db.String(50), nullable=True)   # Liga | Copa | Grupos
     categoria      = db.Column(db.String(50), nullable=True)   # Livre | Profissional | Sub-xx…
+    sub_formato    = db.Column(db.String(50), nullable=True)   # grupos_elim | mata_mata
+    fase_inicial   = db.Column(db.String(50), nullable=True)   # oitavas | quartas | semifinal
+
+    # ── Identidade visual ──────────────────────────────────────────
+    logo_url       = db.Column(db.Text, nullable=True)   # base64 ou URL da logo/avatar
+    capa_url       = db.Column(db.Text, nullable=True)   # base64 ou URL da capa de fundo
 
     times = db.relationship('Time', backref='campeonato', lazy=True)

@@ -25,8 +25,10 @@ def criar_campeonato(user_id):
         duracao_padrao = int(data.get("duracao_padrao") or 45),
         pontos_vitoria = int(data.get("pontos_vitoria") or 3),
         ida_volta      = bool(data.get("ida_volta", False)),
-        formato        = data.get("formato")   or None,
-        categoria      = data.get("categoria") or None,
+        formato        = data.get("formato")      or None,
+        categoria      = data.get("categoria")     or None,
+        sub_formato    = data.get("sub_formato")   or None,
+        fase_inicial   = data.get("fase_inicial")  or None,
     )
     db.session.add(c)
     try:
@@ -82,6 +84,31 @@ def deletar_campeonato(campeonato_id, user_id):
     return jsonify({"ok": True})
 
 
+@campeonato_bp.route("/campeonatos/<int:campeonato_id>/imagem", methods=["PATCH"])
+@require_auth
+def atualizar_imagem_campeonato(campeonato_id, user_id):
+    """Atualiza logo ou capa do campeonato (base64 ou URL)."""
+    c    = get_ou_403(campeonato_id, user_id)
+    data = request.json or {}
+    tipo = data.get("tipo")   # "logo" | "capa"
+    url  = data.get("url")    # string base64 ou URL externa
+
+    if tipo not in ("logo", "capa"):
+        return jsonify({"erro": "tipo deve ser 'logo' ou 'capa'"}), 400
+
+    # Limite de 4 MB em base64 (~3 MB arquivo original)
+    if url and url.startswith("data:") and len(url) > 4 * 1024 * 1024:
+        return jsonify({"erro": "Imagem muito grande. Máximo 3 MB"}), 413
+
+    if tipo == "logo":
+        c.logo_url = url or None
+    else:
+        c.capa_url = url or None
+
+    db.session.commit()
+    return jsonify({"ok": True, "tipo": tipo})
+
+
 def _serializar(c):
     return {
         "id":             c.id,
@@ -93,4 +120,8 @@ def _serializar(c):
         "ida_volta":      bool(c.ida_volta),
         "formato":        c.formato,
         "categoria":      c.categoria,
+        "sub_formato":    c.sub_formato,
+        "fase_inicial":   c.fase_inicial,
+        "logo_url":       c.logo_url,
+        "capa_url":       c.capa_url,
     }

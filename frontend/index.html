@@ -9,6 +9,7 @@
   <meta name="theme-color" content="#10b981" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
   <title>GolApp</title>
+  <link rel="icon" href="data:,">
   <!-- Google OAuth Client ID — substitua pelo seu na produção -->
   <meta name="google-client-id" content="">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -155,6 +156,9 @@
         <div class="nav-item" data-tela="campeonatos">
           <i class="bi bi-trophy-fill nav-icon"></i><span>Campeonatos</span>
         </div>
+        <div class="nav-item" data-tela="planos">
+          <i class="bi bi-gem nav-icon"></i><span>Planos</span>
+        </div>
 
         <div class="sidebar-section-label">Geral</div>
 
@@ -295,6 +299,7 @@
               <div class="cc-pills" id="modalidade-pills">
                 <button type="button" class="cc-pill" data-value="Futebol">Futebol</button>
                 <button type="button" class="cc-pill" data-value="Futsal">Futsal</button>
+                <button type="button" class="cc-pill" data-value="Fut7">Fut7</button>
                 <button type="button" class="cc-pill" data-value="Basquete">Basquete</button>
                 <button type="button" class="cc-pill" data-value="V&ocirc;lei">V&ocirc;lei</button>
                 <button type="button" class="cc-pill" data-value="Handebol">Handebol</button>
@@ -310,14 +315,31 @@
                 <button type="button" class="cc-pill" data-value="Liga">
                   <i class="bi bi-table"></i> Liga
                 </button>
-                <button type="button" class="cc-pill" data-value="Copa">
-                  <i class="bi bi-diagram-3"></i> Copa
+                <button type="button" class="cc-pill" data-value="Eliminat&oacute;rias">
+                  <i class="bi bi-diagram-3"></i> Eliminat&oacute;rias
                 </button>
                 <button type="button" class="cc-pill" data-value="Grupos">
                   <i class="bi bi-grid-3x3-gap"></i> Grupos
                 </button>
               </div>
               <div class="cc-hint" id="formato-hint"></div>
+            </div>
+
+            <!-- Fase inicial das eliminat&oacute;rias (mata-mata) -->
+            <div class="cc-section hidden" id="copa-fase-inicial-section">
+              <div class="cc-section-label">Come&ccedil;ar nas&hellip;</div>
+              <div class="cc-pills" id="fase-inicial-pills">
+                <button type="button" class="cc-pill" data-value="oitavas">
+                  <i class="bi bi-trophy"></i> Oitavas de final
+                </button>
+                <button type="button" class="cc-pill" data-value="quartas">
+                  <i class="bi bi-trophy"></i> Quartas de final
+                </button>
+                <button type="button" class="cc-pill" data-value="semifinal">
+                  <i class="bi bi-trophy"></i> Semifinal
+                </button>
+              </div>
+              <div class="cc-hint">Mata-mata direto, com disputa de 3&ordm; lugar.</div>
             </div>
 
             <!-- Categoria -->
@@ -328,11 +350,15 @@
                 <button type="button" class="cc-pill" data-value="Profissional">Profissional</button>
                 <button type="button" class="cc-pill" data-value="Feminino">Feminino</button>
                 <button type="button" class="cc-pill" data-value="Misto">Misto</button>
-                <button type="button" class="cc-pill cc-pill-sub" data-value="Sub-20">Sub-20</button>
-                <button type="button" class="cc-pill cc-pill-sub" data-value="Sub-17">Sub-17</button>
-                <button type="button" class="cc-pill cc-pill-sub" data-value="Sub-15">Sub-15</button>
-                <button type="button" class="cc-pill cc-pill-sub" data-value="Sub-13">Sub-13</button>
-                <button type="button" class="cc-pill cc-pill-sub" data-value="Sub-11">Sub-11</button>
+                <button type="button" class="cc-pill cc-pill-sub" id="pill-sub-custom">
+                  <i class="bi bi-person-badge"></i>&nbsp;Sub&hellip;
+                </button>
+              </div>
+              <div class="cc-sub-wrap" id="cc-sub-wrap">
+                <span class="cc-sub-prefix">Sub-</span>
+                <input type="number" id="subIdade" class="cc-sub-input"
+                       min="5" max="23" placeholder="17">
+                <span class="cc-sub-anos">anos</span>
               </div>
             </div>
 
@@ -429,33 +455,68 @@
       <!-- Visão Geral (contexto campeonato) -->
       <div id="overview" class="tela">
 
-        <!-- Hero do campeonato -->
-        <div class="camp-hero" id="camp-hero" data-sport-icon="🏆">
-          <div class="camp-hero-top-row">
+        <!-- Capa + identidade (estilo profile) -->
+        <div class="ov-profile">
+          <!-- Capa de fundo -->
+          <div class="ov-cover" id="ov-cover">
+            <div class="ov-cover-overlay"></div>
+            <button class="ov-cover-btn" id="btn-trocar-capa" title="Trocar capa">
+              <i class="bi bi-camera"></i>
+              <span>Editar capa</span>
+            </button>
+          </div>
+
+          <!-- Barra de identidade: avatar + nome + meta + status -->
+          <div class="ov-identity">
+            <!-- Avatar / logo do campeonato -->
+            <div class="ov-avatar-wrap" id="ov-avatar-wrap">
+              <div class="ov-avatar" id="ov-avatar">
+                <span class="ov-avatar-emoji" id="ov-avatar-emoji">🏆</span>
+                <img class="ov-avatar-img hidden" id="ov-avatar-img" alt="Logo" />
+              </div>
+              <button class="ov-avatar-edit" id="btn-trocar-logo" title="Trocar logo">
+                <i class="bi bi-camera-fill"></i>
+              </button>
+            </div>
+
+            <!-- Info do campeonato -->
+            <div class="ov-identity-info">
+              <h1 class="ov-camp-nome" id="camp-hero-nome">&mdash;</h1>
+              <div class="ov-camp-meta" id="camp-hero-meta"></div>
+            </div>
+
+            <!-- Badge de status (canto direito) -->
             <span class="camp-hero-badge camp-hero-badge--nao-iniciado" id="camp-hero-badge">N&atilde;o iniciado</span>
           </div>
-          <h1 class="camp-hero-name" id="camp-hero-nome">&mdash;</h1>
-          <div class="camp-hero-meta" id="camp-hero-meta"></div>
+
+          <!-- Barra de progresso sutil -->
+          <div class="ov-progress-bar-wrap" id="ov-progress-bar-wrap">
+            <div class="ov-progress-fill" id="ov-progress-fill" style="width:0%"></div>
+          </div>
         </div>
 
-        <!-- Stats -->
+        <!-- Inputs ocultos para upload de imagem -->
+        <input type="file" id="input-capa" accept="image/*" class="hidden" />
+        <input type="file" id="input-logo" accept="image/*" class="hidden" />
+
+        <!-- Stats row -->
         <div class="ov-stats-row" id="ov-stats-row"></div>
 
         <!-- Grid principal -->
         <div class="ov-grid">
           <div class="ov-col">
             <div class="card">
-              <div class="ov-section-title">Pr&oacute;ximos jogos</div>
+              <div class="ov-section-title"><i class="bi bi-calendar-event"></i>Pr&oacute;ximos jogos</div>
               <div id="ov-proximos"></div>
             </div>
             <div class="card">
-              <div class="ov-section-title">&Uacute;ltimos resultados</div>
+              <div class="ov-section-title"><i class="bi bi-flag"></i>&Uacute;ltimos resultados</div>
               <div id="ov-resultados"></div>
             </div>
           </div>
           <div class="ov-col">
             <div class="card">
-              <div class="ov-section-title">Classifica&ccedil;&atilde;o</div>
+              <div class="ov-section-title"><i class="bi bi-list-ol"></i>Classifica&ccedil;&atilde;o</div>
               <div id="ov-classif-mini"></div>
             </div>
           </div>
@@ -653,6 +714,108 @@
         <p class="sobre-copy">&copy; 2026 GolApp. Todos os direitos reservados.</p>
       </div>
 
+      <!-- Planos -->
+      <div id="planos" class="tela">
+
+        <div class="planos-hero">
+          <div class="planos-hero-badge">GolApp Pro</div>
+          <h2 class="planos-hero-title">Escolha seu plano</h2>
+          <p class="planos-hero-sub">Gerencie campeonatos com mais liberdade. Cancele quando quiser.</p>
+        </div>
+
+        <!-- Banner: plano ativo -->
+        <div class="plano-ativo-banner hidden" id="plano-ativo-banner">
+          <div class="plano-ativo-banner-icon"><i class="bi bi-gem"></i></div>
+          <div class="plano-ativo-banner-body">
+            <div class="plano-ativo-banner-title" id="plano-ativo-banner-title">Plano ativo</div>
+            <div class="plano-ativo-banner-sub" id="plano-ativo-banner-sub"></div>
+          </div>
+          <button class="plano-ativo-banner-cancel" id="btn-cancelar-plano">Cancelar</button>
+        </div>
+
+        <div class="planos-grid">
+
+          <!-- Mensal -->
+          <div class="plano-card">
+            <div class="plano-header">
+              <span class="plano-nome">Mensal</span>
+              <div class="plano-preco">
+                <span class="plano-cifrao">R$</span>
+                <span class="plano-valor">19</span>
+                <span class="plano-centavos">,99</span>
+              </div>
+              <span class="plano-periodo">por m&ecirc;s</span>
+            </div>
+            <ul class="plano-features">
+              <li><i class="bi bi-check-circle-fill"></i> Campeonatos ilimitados*</li>
+              <li><i class="bi bi-check-circle-fill"></i> Times e jogos ilimitados</li>
+              <li><i class="bi bi-check-circle-fill"></i> Classifica&ccedil;&atilde;o autom&aacute;tica</li>
+              <li><i class="bi bi-check-circle-fill"></i> M&uacute;ltiplos formatos</li>
+              <li><i class="bi bi-check-circle-fill"></i> Artilharia e cart&otilde;es</li>
+              <li><i class="bi bi-check-circle-fill"></i> Hist&oacute;rico de partidas</li>
+              <li><i class="bi bi-check-circle-fill"></i> Estat&iacute;sticas detalhadas</li>
+              <li><i class="bi bi-x-circle"></i> Suporte priorit&aacute;rio</li>
+              <li><i class="bi bi-x-circle"></i> Acesso antecipado a novos recursos</li>
+            </ul>
+            <button class="plano-btn plano-btn--outline" id="btn-assinar-mensal">Assinar mensal</button>
+            <p class="plano-note">* + R$5&ndash;10 por campeonato criado</p>
+          </div>
+
+          <!-- Anual — destaque -->
+          <div class="plano-card plano-card--featured">
+            <div class="plano-badge-top">Melhor custo-benef&iacute;cio</div>
+            <div class="plano-header">
+              <span class="plano-nome">Anual</span>
+              <div class="plano-preco">
+                <span class="plano-cifrao">R$</span>
+                <span class="plano-valor">110</span>
+              </div>
+              <span class="plano-periodo">por ano &middot; equiv. R$9,17/m&ecirc;s</span>
+            </div>
+            <div class="plano-economia">Economize R$130/ano</div>
+            <ul class="plano-features">
+              <li><i class="bi bi-check-circle-fill"></i> Campeonatos ilimitados*</li>
+              <li><i class="bi bi-check-circle-fill"></i> Times e jogos ilimitados</li>
+              <li><i class="bi bi-check-circle-fill"></i> Classifica&ccedil;&atilde;o autom&aacute;tica</li>
+              <li><i class="bi bi-check-circle-fill"></i> M&uacute;ltiplos formatos</li>
+              <li><i class="bi bi-check-circle-fill"></i> Artilharia e cart&otilde;es</li>
+              <li><i class="bi bi-check-circle-fill"></i> Hist&oacute;rico de partidas</li>
+              <li><i class="bi bi-check-circle-fill"></i> Estat&iacute;sticas detalhadas</li>
+              <li><i class="bi bi-check-circle-fill"></i> Suporte priorit&aacute;rio</li>
+              <li><i class="bi bi-check-circle-fill"></i> Acesso antecipado a novos recursos</li>
+            </ul>
+            <button class="plano-btn plano-btn--primary" id="btn-assinar-anual">Assinar anual</button>
+            <p class="plano-note">* + R$5&ndash;10 por campeonato criado</p>
+          </div>
+
+        </div>
+
+        <!-- Cobrança por campeonato -->
+        <div class="card">
+          <div class="card-title">Cobran&ccedil;a por campeonato</div>
+          <p class="plano-camp-desc">Al&eacute;m da mensalidade, cada campeonato criado tem uma taxa avulsa conforme o tipo escolhido.</p>
+          <div class="plano-camp-grid">
+            <div class="plano-camp-item">
+              <div class="plano-camp-icon"><i class="bi bi-trophy"></i></div>
+              <div class="plano-camp-body">
+                <div class="plano-camp-nome">B&aacute;sico</div>
+                <div class="plano-camp-sub">At&eacute; 8 times, liga simples</div>
+              </div>
+              <div class="plano-camp-preco">R$&nbsp;5</div>
+            </div>
+            <div class="plano-camp-item plano-camp-item--featured">
+              <div class="plano-camp-icon"><i class="bi bi-trophy-fill"></i></div>
+              <div class="plano-camp-body">
+                <div class="plano-camp-nome">Pro</div>
+                <div class="plano-camp-sub">Times ilimitados, todos os formatos</div>
+              </div>
+              <div class="plano-camp-preco">R$&nbsp;10</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
     </div><!-- /.content-area -->
   </div><!-- /.content -->
 
@@ -664,6 +827,9 @@
     </button>
     <button class="bottom-nav-item ctx-geral" data-tela="campeonatos">
       <i class="bi bi-trophy-fill"></i><span>Campeonatos</span>
+    </button>
+    <button class="bottom-nav-item ctx-geral" data-tela="planos">
+      <i class="bi bi-gem"></i><span>Planos</span>
     </button>
     <button class="bottom-nav-item ctx-geral" data-tela="configuracoes">
       <i class="bi bi-sliders2"></i><span>Config.</span>
@@ -687,7 +853,83 @@
     <button class="bottom-nav-item ctx-camp" data-tela="estatisticas">
       <i class="bi bi-graph-up-arrow"></i><span>Stats</span>
     </button>
+    <button class="bottom-nav-item ctx-camp" id="btn-mais-camp" aria-label="Mais opções">
+      <i class="bi bi-grid-3x3-gap-fill"></i><span>Mais</span>
+    </button>
   </nav>
+
+  <!-- ── MAIS SHEET (mobile — contexto campeonato) ─────────────── -->
+  <div class="mais-sheet-backdrop" id="mais-sheet-backdrop" aria-hidden="true">
+    <div class="mais-sheet" id="mais-sheet" role="dialog" aria-label="Mais opções">
+      <div class="mais-sheet-handle"></div>
+      <div class="mais-sheet-title">Mais opções</div>
+      <div class="mais-sheet-grid">
+        <button class="mais-sheet-item" data-tela="artilharia">
+          <i class="bi bi-lightning-fill"></i><span>Artilharia</span>
+        </button>
+        <button class="mais-sheet-item" data-tela="avisos">
+          <i class="bi bi-megaphone-fill"></i><span>Avisos</span>
+        </button>
+        <button class="mais-sheet-item" data-tela="regulamento">
+          <i class="bi bi-file-text-fill"></i><span>Regulamento</span>
+        </button>
+        <button class="mais-sheet-item" data-tela="config-camp">
+          <i class="bi bi-sliders2"></i><span>Config.</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL PAGAMENTO CAMPEONATO ──────────────────────────── -->
+  <div id="modal-pagamento" class="modal">
+    <div class="modal-box modal-pag-box">
+      <button class="modal-close" id="btn-fechar-pagamento">&#x2715;</button>
+
+      <div class="modal-pag-header">
+        <i class="bi bi-trophy-fill modal-pag-icon"></i>
+        <div class="modal-pag-title">Criar campeonato</div>
+        <div class="modal-pag-sub">Escolha o tipo e confirme</div>
+      </div>
+
+      <div class="modal-pag-opcoes">
+        <label class="pag-opcao">
+          <input type="radio" name="pag-tipo" value="basico" checked>
+          <div class="pag-opcao-body">
+            <div class="pag-opcao-nome">B&aacute;sico</div>
+            <div class="pag-opcao-desc">At&eacute; 8 times &middot; liga simples</div>
+          </div>
+          <div class="pag-opcao-preco">R$&nbsp;5</div>
+          <div class="pag-opcao-check"><i class="bi bi-check-circle-fill"></i></div>
+        </label>
+        <label class="pag-opcao">
+          <input type="radio" name="pag-tipo" value="pro">
+          <div class="pag-opcao-body">
+            <div class="pag-opcao-nome">Pro <span class="pag-badge-rec">Popular</span></div>
+            <div class="pag-opcao-desc">Times ilimitados &middot; todos os formatos</div>
+          </div>
+          <div class="pag-opcao-preco">R$&nbsp;10</div>
+          <div class="pag-opcao-check"><i class="bi bi-check-circle-fill"></i></div>
+        </label>
+      </div>
+
+      <div class="modal-pag-metodo">
+        <div class="modal-pag-metodo-label">Forma de pagamento</div>
+        <div class="pag-metodos">
+          <label class="pag-metodo-item">
+            <input type="radio" name="pag-metodo" value="pix" checked>
+            <i class="bi bi-qr-code"></i> Pix
+          </label>
+          <label class="pag-metodo-item">
+            <input type="radio" name="pag-metodo" value="cartao">
+            <i class="bi bi-credit-card"></i> Cart&atilde;o
+          </label>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="btn-confirmar-pagamento"
+              style="width:100%;margin-top:4px">Confirmar e criar</button>
+    </div>
+  </div>
 
   <!-- ── MODAL PARTIDA ──────────────────────────────────────────────── -->
   <div id="modal-jogo" class="modal">

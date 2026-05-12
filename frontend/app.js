@@ -13,6 +13,7 @@ import { load as loadClassificacao,
 import { load as loadOverview,  refresh as refreshOverview }          from "./pages/overview.js";
 import { load as loadEstatisticas }                                   from "./pages/estatisticas.js";
 import { fechar as fecharModal, gol, cartao, avancarStatus }          from "./components/modal.js";
+import { notificar }                                                    from "./components/ui.js";
 
 // ── Navegação ─────────────────────────────────────────────────────────────────
 let _telaAtual = "dashboard";
@@ -20,6 +21,7 @@ let _telaAtual = "dashboard";
 const _LABEL = {
   dashboard:      "Dashboard",
   campeonatos:    "Campeonatos",
+  planos:         "Planos",
   overview:       "Vis\u00e3o Geral",
   times:          "Times",
   jogos:          "Jogos",
@@ -55,6 +57,7 @@ function mudarTela(id) {
     case "config-camp":   _loadConfigCamp(); break;
     case "configuracoes":  _syncConfig();      break;
     case "sobre":          break;  // página estática
+    case "planos":         _loadPlanos();      break;
   }
 }
 
@@ -164,6 +167,90 @@ function _campConfigRows(camp) {
       <span class="camp-config-key">${_esc(String(k))}</span>
       <span class="camp-config-val">${_esc(String(v))}</span>
     </div>`).join("");
+}
+
+// ── Planos ───────────────────────────────────────────────────────────────────
+function _loadPlanos() {
+  const u = getUsuario();
+  _renderPlanoBanner(u);
+  _atualizarBotoesPlano(u);
+}
+
+function _renderPlanoBanner(u) {
+  const banner = document.getElementById("plano-ativo-banner");
+  if (!banner) return;
+  if (!u?.plano_ativo) { banner.classList.add("hidden"); return; }
+  banner.classList.remove("hidden");
+  const titulo = document.getElementById("plano-ativo-banner-title");
+  const sub    = document.getElementById("plano-ativo-banner-sub");
+  if (titulo) titulo.textContent = u.plano_tipo === "anual" ? "Plano Anual ativo 🎉" : "Plano Mensal ativo";
+  if (sub && u.plano_validade) {
+    const d = new Date(u.plano_validade);
+    sub.textContent = `Válido até ${d.toLocaleDateString("pt-BR")} · Renova automaticamente`;
+  }
+}
+
+function _atualizarBotoesPlano(u) {
+  const btnMensal = document.getElementById("btn-assinar-mensal");
+  const btnAnual  = document.getElementById("btn-assinar-anual");
+  const ativoMensal = u?.plano_ativo && u?.plano_tipo === "mensal";
+  const ativoAnual  = u?.plano_ativo && u?.plano_tipo === "anual";
+  if (btnMensal) {
+    btnMensal.textContent = ativoMensal ? "Plano atual" : "Assinar mensal";
+    btnMensal.className = ativoMensal
+      ? "plano-btn plano-btn--active"
+      : "plano-btn plano-btn--outline";
+    btnMensal.disabled = ativoMensal;
+  }
+  if (btnAnual) {
+    btnAnual.textContent = ativoAnual ? "Plano atual" : "Assinar anual";
+    btnAnual.className = ativoAnual
+      ? "plano-btn plano-btn--active"
+      : "plano-btn plano-btn--primary";
+    btnAnual.disabled = ativoAnual;
+  }
+}
+
+async function _assinarPlano(tipo) {
+  try {
+    const resp = await fetch("/api/planos/assinar", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${getToken()}`,
+      },
+      body: JSON.stringify({ tipo }),
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw data;
+    const { setAuth } = await import("./store.js");
+    const novo = { ...getUsuario(), ...data };
+    setAuth(novo, getToken());
+    _renderPlanoBanner(novo);
+    _atualizarBotoesPlano(novo);
+    notificar(`Plano ${tipo} ativado com sucesso!`, "sucesso");
+  } catch (e) {
+    notificar(e?.erro || "Erro ao assinar plano");
+  }
+}
+
+async function _cancelarPlano() {
+  try {
+    const resp = await fetch("/api/planos/cancelar", {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${getToken()}` },
+    });
+    const data = await resp.json();
+    if (!resp.ok) throw data;
+    const { setAuth } = await import("./store.js");
+    const novo = { ...getUsuario(), plano_ativo: false, plano_tipo: null, plano_validade: null };
+    setAuth(novo, getToken());
+    _renderPlanoBanner(novo);
+    _atualizarBotoesPlano(novo);
+    notificar("Assinatura cancelada.", "sucesso");
+  } catch (e) {
+    notificar(e?.erro || "Erro ao cancelar assinatura");
+  }
 }
 
 // ── Toggle de visibilidade de senha ──────────────────────────────────────────────
@@ -312,6 +399,26 @@ function _stopPolling() {
     el.addEventListener("click", () => mudarTela(el.dataset.tela));
   });
 
+  // Mais sheet (mobile — contexto campeonato)
+  const maisBackdrop = document.getElementById("mais-sheet-backdrop");
+  document.getElementById("btn-mais-camp")?.addEventListener("click", () => {
+    maisBackdrop?.classList.add("open");
+    maisBackdrop?.removeAttribute("aria-hidden");
+  });
+  maisBackdrop?.addEventListener("click", e => {
+    if (e.target === maisBackdrop) {
+      maisBackdrop.classList.remove("open");
+      maisBackdrop.setAttribute("aria-hidden", "true");
+    }
+  });
+  document.querySelectorAll(".mais-sheet-item[data-tela]").forEach(el => {
+    el.addEventListener("click", () => {
+      maisBackdrop?.classList.remove("open");
+      maisBackdrop?.setAttribute("aria-hidden", "true");
+      mudarTela(el.dataset.tela);
+    });
+  });
+
   // Contexto de campeonato
   document.addEventListener("golapp:abrir-campeonato", e => abrirContextoCampeonato(e.detail));
   document.getElementById("btn-voltar-geral")?.addEventListener("click", voltarContextoGeral);
@@ -376,6 +483,11 @@ function _stopPolling() {
       custom.style.display =
         document.getElementById("modalDuracaoSelect").value === "custom" ? "" : "none";
   });
+
+  // Planos — assinar e cancelar
+  document.getElementById("btn-assinar-mensal")?.addEventListener("click", () => _assinarPlano("mensal"));
+  document.getElementById("btn-assinar-anual")?.addEventListener("click",  () => _assinarPlano("anual"));
+  document.getElementById("btn-cancelar-plano")?.addEventListener("click", _cancelarPlano);
 
   // Escutar evento de campeonatos criados (disparado por campeonatos.js)
   document.addEventListener("golapp:campeonatos-updated", () => loadDashboard());

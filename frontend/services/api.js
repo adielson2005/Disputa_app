@@ -36,6 +36,8 @@ export const loginGoogle = (credential)    => _req("POST", "/auth/google",  { cr
 export const getCampeonatos   = ()     => _req("GET",    "/campeonatos",       null, true);
 export const createCampeonato = (data) => _req("POST",   "/campeonatos",       data, true);
 export const deleteCampeonato = (id)   => _req("DELETE", `/campeonatos/${id}`, null, true);
+export const updateCampeonatoImagem = (id, tipo, url) =>
+  _req("PATCH", `/campeonatos/${id}/imagem`, { tipo, url }, true);
 
 // ── Times ─────────────────────────────────────────────────────────────────────
 export const getTimes   = (campeonatoId) => _req("GET",  `/times/${campeonatoId}`,   null, true);

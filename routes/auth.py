@@ -46,11 +46,14 @@ def _emit_token(user: User) -> dict:
         current_app.config["JWT_EXPIRATION_HOURS"],
     )
     return {
-        "token":    token,
-        "id":       user.id,
-        "email":    user.email,
-        "nome":     user.nome,
-        "foto_url": user.foto_url,
+        "token":          token,
+        "id":             user.id,
+        "email":          user.email,
+        "nome":           user.nome,
+        "foto_url":       user.foto_url,
+        "plano_ativo":    bool(user.plano_ativo),
+        "plano_tipo":     user.plano_tipo,
+        "plano_validade": user.plano_validade.isoformat() if user.plano_validade else None,
     }
 
 

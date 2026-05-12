@@ -9,12 +9,14 @@ let _filtro = "";
 let _idaVolta = false;
 let _modalidade = "";
 let _formato = "";
+let _faseInicial = "";  // oitavas | quartas | semifinal
 let _categoria = "";
+let _subCustom = "";
 
 const FORMATO_HINT = {
-  "Liga":   "Todos contra todos, classificação por pontos",
-  "Copa":   "Eliminatória direta, perdeu sai",
-  "Grupos": "Fase de grupos + mata-mata",
+  "Liga":          "Todos contra todos, classificação por pontos",
+  "Eliminatórias": "Mata-mata direto — oitavas, quartas ou semifinal, com disputa de 3º lugar",
+  "Grupos":        "Fase de grupos + mata-mata",
 };
 
 const STATUS_META = {
@@ -26,10 +28,13 @@ const STATUS_META = {
 const MODALIDADE_ICONS = {
   futebol:    "bi-dribbble",
   futsal:     "bi-dribbble",
+  fut7:       "bi-dribbble",
   basquete:   "bi-basket",
   volei:      "bi-disc",
+  vôlei:      "bi-disc",
   handebol:   "bi-hand-index-thumb",
   hoquei:     "bi-activity",
+  hóquei:     "bi-activity",
 };
 
 export function init() {
@@ -64,16 +69,54 @@ export function init() {
     pill.classList.add("selected");
     const hint = _el("formato-hint");
     if (hint) hint.textContent = FORMATO_HINT[_formato] || "";
+    _atualizarVisibilidadeEliminatorias();
   });
 
-  // Pills de categoria
+  // Pills de fase inicial (eliminatórias)
+  _el("fase-inicial-pills")?.addEventListener("click", e => {
+    const pill = e.target.closest(".cc-pill");
+    if (!pill) return;
+    _faseInicial = pill.dataset.value;
+    _el("fase-inicial-pills").querySelectorAll(".cc-pill").forEach(p => p.classList.remove("selected"));
+    pill.classList.add("selected");
+  });
+
+  // Pills de categoria (incluindo Sub customizável)
   _el("categoria-pills")?.addEventListener("click", e => {
     const pill = e.target.closest(".cc-pill");
     if (!pill) return;
-    _categoria = pill.dataset.value;
     _el("categoria-pills").querySelectorAll(".cc-pill").forEach(p => p.classList.remove("selected"));
     pill.classList.add("selected");
+    if (pill.id === "pill-sub-custom") {
+      _el("cc-sub-wrap")?.classList.add("visible");
+      _el("subIdade")?.focus();
+      const val = _el("subIdade")?.value;
+      _categoria = val ? `Sub-${val}` : "";
+      _subCustom = _categoria;
+    } else {
+      _el("cc-sub-wrap")?.classList.remove("visible");
+      _categoria = pill.dataset.value;
+      _subCustom = "";
+    }
   });
+
+  // Input da faixa etária Sub
+  _el("subIdade")?.addEventListener("input", () => {
+    const val = _el("subIdade").value;
+    _subCustom = val ? `Sub-${val}` : "";
+    _categoria = _subCustom;
+    const pill = _el("pill-sub-custom");
+    if (pill) pill.innerHTML = val
+      ? `<i class="bi bi-person-badge"></i>&nbsp;Sub-${val}`
+      : `<i class="bi bi-person-badge"></i>&nbsp;Sub…`;
+  });
+
+  // Modal de pagamento
+  _el("btn-fechar-pagamento")?.addEventListener("click", _fecharPagamento);
+  _el("modal-pagamento")?.addEventListener("click", e => {
+    if (e.target === _el("modal-pagamento")) _fecharPagamento();
+  });
+  _el("btn-confirmar-pagamento")?.addEventListener("click", _executarCriacao);
 
   // Toggle ida e volta
   _el("toggle-ida-volta-wrap")?.addEventListener("click", () => {
@@ -127,12 +170,7 @@ export async function load() {
 // ── Internos ──────────────────────────────────────────────────────────────────
 
 async function _handleCriar() {
-  const nome           = _el("nomeCampeonato").value.trim();
-  const duracao_padrao = parseInt(_el("duracaoPadrao")?.value) || 45;
-  const pontos_vitoria = parseInt(_el("pontosVitoria")?.value) || 3;
-  const descricao      = _el("descricaoCampeonato")?.value.trim() || null;
-  const usuario        = getUsuario();
-
+  const nome = _el("nomeCampeonato").value.trim();
   if (!nome) {
     notificar("Informe o nome do campeonato", "info");
     _el("nomeCampeonato")?.focus();
@@ -142,40 +180,68 @@ async function _handleCriar() {
     notificar("Selecione a modalidade", "info");
     return;
   }
-  if (!usuario) return;
+  if (!getUsuario()) return;
+  _abrirPagamento();
+}
+
+function _abrirPagamento() {
+  const modal = _el("modal-pagamento");
+  if (modal) modal.classList.add("open");
+}
+
+function _fecharPagamento() {
+  const modal = _el("modal-pagamento");
+  if (modal) modal.classList.remove("open");
+}
+
+async function _executarCriacao() {
+  const nome           = _el("nomeCampeonato").value.trim();
+  const duracao_padrao = parseInt(_el("duracaoPadrao")?.value) || 45;
+  const pontos_vitoria = parseInt(_el("pontosVitoria")?.value) || 3;
+  const descricao      = _el("descricaoCampeonato")?.value.trim() || null;
+  const usuario        = getUsuario();
+  if (!nome || !usuario) return;
+
+  const tipoPag = document.querySelector('input[name="pag-tipo"]:checked')?.value || "basico";
+  const preco   = tipoPag === "pro" ? "R 10 · Pro" : "R 5 · Básico";
+  _fecharPagamento();
 
   const btn = _el("btn-criar-campeonato");
-  if (btn) { btn.disabled = true; btn.innerHTML = `<span class="ui-spinner"></span> Criando…`; }
+  if (btn) { btn.disabled = true; btn.innerHTML = `<span class="ui-spinner"></span> Criando...`; }
 
   try {
     await createCampeonato({
       nome, modalidade: _modalidade,
       duracao_padrao, pontos_vitoria,
       ida_volta: _idaVolta, descricao,
-      formato: _formato   || null,
-      categoria: _categoria || null,
-      user_id: usuario.id,
+      formato:      _formato      || null,
+      fase_inicial: _faseInicial  || null,
+      categoria:    _categoria    || null,
+      user_id:      usuario.id,
     });
-    // Resetar form
-    _el("nomeCampeonato").value           = "";
-    if (_el("duracaoPadrao"))  _el("duracaoPadrao").value  = "45";
-    if (_el("pontosVitoria")) _el("pontosVitoria").value  = "3";
+    _el("nomeCampeonato").value = "";
+    if (_el("duracaoPadrao"))       _el("duracaoPadrao").value       = "45";
+    if (_el("pontosVitoria"))       _el("pontosVitoria").value       = "3";
     if (_el("descricaoCampeonato")) _el("descricaoCampeonato").value = "";
-    _modalidade = "";
-    _idaVolta   = false;
-    _formato    = "";
-    _categoria  = "";
+    if (_el("subIdade"))            _el("subIdade").value            = "";
+    _modalidade = ""; _idaVolta = false; _formato = ""; _faseInicial = ""; _categoria = ""; _subCustom = "";
     _el("modalidade-pills")?.querySelectorAll(".cc-pill").forEach(p => p.classList.remove("selected"));
     _el("formato-pills")?.querySelectorAll(".cc-pill").forEach(p => p.classList.remove("selected"));
+    _el("fase-inicial-pills")?.querySelectorAll(".cc-pill").forEach(p => p.classList.remove("selected"));
     _el("categoria-pills")?.querySelectorAll(".cc-pill").forEach(p => p.classList.remove("selected"));
     const hint = _el("formato-hint"); if (hint) hint.textContent = "";
     _el("toggle-ida-volta-wrap")?.classList.remove("ativo");
+    _el("cc-sub-wrap")?.classList.remove("visible");
+    _el("copa-fase-inicial-section")?.classList.add("hidden");
+    const subPill = _el("pill-sub-custom");
+    if (subPill) subPill.innerHTML = `<i class="bi bi-person-badge"></i>&nbsp;Sub...`;
     _fecharPainel();
     await _renderLista();
     document.dispatchEvent(new CustomEvent("golapp:campeonatos-updated"));
-  } catch (e) {
-    console.error("Erro ao criar campeonato", e);
-    notificar(e.erro || "Erro ao criar campeonato");
+    notificar("Campeonato criado! (" + preco + ")", "sucesso");
+  } catch (err) {
+    console.error("Erro ao criar campeonato", err);
+    notificar(err.erro || "Erro ao criar campeonato");
   } finally {
     if (btn) { btn.disabled = false; btn.textContent = "Criar campeonato"; }
   }
@@ -209,8 +275,12 @@ async function _confirmarDelecao(id) {
 }
 
 async function _renderLista() {
-  _lista = await getCampeonatos();
-  _pintarLista();
+  try {
+    _lista = await getCampeonatos();
+    _pintarLista();
+  } catch (e) {
+    if (e?.status !== 401) console.error("Campeonatos load error", e);
+  }
 }
 
 function _pintarLista() {
@@ -268,4 +338,13 @@ function _pintarLista() {
 }
 
 function _el(id) { return document.getElementById(id); }
+
+function _atualizarVisibilidadeEliminatorias() {
+  const show = _formato === "Eliminatórias";
+  _el("copa-fase-inicial-section")?.classList.toggle("hidden", !show);
+  if (!show) {
+    _faseInicial = "";
+    _el("fase-inicial-pills")?.querySelectorAll(".cc-pill").forEach(p => p.classList.remove("selected"));
+  }
+}
 

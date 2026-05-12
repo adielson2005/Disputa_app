@@ -1,6 +1,6 @@
 // ── Página: Visão Geral do Campeonato ────────────────────────────────────────
-import { getTimes, getJogos, getClassificacao } from "../services/api.js";
-import { getCampeonatoId, getCampeonatoAtual } from "../store.js";
+import { getTimes, getJogos, getClassificacao, updateCampeonatoImagem } from "../services/api.js";
+import { getCampeonatoAtual, setCampeonatoAtual } from "../store.js";
 import { abrir as abrirModal } from "../components/modal.js";
 
 const SPORT_EMOJI = {
@@ -16,53 +16,185 @@ const SPORT_ICON = {
 
 let _jogos = [];
 
-export async function load()    { _skeleton(); await refresh(); }
+// ── Inicialização (uma vez) ────────────────────────────────────────────────────
+
+let _listenersOk = false;
+function _initListeners() {
+  if (_listenersOk) return;
+  _listenersOk = true;
+
+  // Botão "Editar capa" → abre input file
+  document.getElementById("btn-trocar-capa")?.addEventListener("click", () => {
+    document.getElementById("input-capa")?.click();
+  });
+
+  // Botão "Trocar logo" → abre input file
+  document.getElementById("btn-trocar-logo")?.addEventListener("click", () => {
+    document.getElementById("input-logo")?.click();
+  });
+
+  // Mudança de arquivo: capa
+  document.getElementById("input-capa")?.addEventListener("change", e => {
+    const file = e.target.files?.[0];
+    if (file) _handleImageUpload(file, "capa");
+    e.target.value = "";
+  });
+
+  // Mudança de arquivo: logo
+  document.getElementById("input-logo")?.addEventListener("change", e => {
+    const file = e.target.files?.[0];
+    if (file) _handleImageUpload(file, "logo");
+    e.target.value = "";
+  });
+
+  // Clique nos match cards → abre modal do jogo
+  document.addEventListener("click", e => {
+    const m = e.target.closest(".ov-match[data-id]");
+    if (!m) return;
+    const jogo = _jogos.find(j => j.id === parseInt(m.dataset.id));
+    if (jogo) abrirModal(jogo);
+  });
+}
+
+// ── Upload de imagem ──────────────────────────────────────────────────────────
+
+async function _handleImageUpload(file, tipo) {
+  if (!file.type.startsWith("image/")) return;
+  if (file.size > 3 * 1024 * 1024) {
+    alert("Imagem muito grande. Máximo 3 MB.");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = async (ev) => {
+    const base64 = ev.target.result;
+    const camp   = getCampeonatoAtual();
+    if (!camp?.id) return;
+
+    // Aplica visualmente de imediato (otimista)
+    _applyImage(tipo, base64, camp);
+
+    // Persiste no servidor
+    try {
+      await updateCampeonatoImagem(camp.id, tipo, base64);
+      // Atualiza o store local
+      const updated = { ...camp };
+      if (tipo === "capa") updated.capa_url = base64;
+      else                 updated.logo_url = base64;
+      setCampeonatoAtual(updated);
+    } catch (err) {
+      console.error("Erro ao salvar imagem:", err);
+      alert("Não foi possível salvar a imagem. Tente novamente.");
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function _applyImage(tipo, url, camp) {
+  if (tipo === "capa") {
+    const cover = document.getElementById("ov-cover");
+    if (cover) cover.style.backgroundImage = `url(${url})`;
+  } else {
+    const img   = document.getElementById("ov-avatar-img");
+    const emoji = document.getElementById("ov-avatar-emoji");
+    if (img && emoji) {
+      img.src = url;
+      img.classList.remove("hidden");
+      emoji.classList.add("hidden");
+    }
+  }
+}
+
+// ── Exports públicos ──────────────────────────────────────────────────────────
+
+export async function load() {
+  _initListeners();
+  _skeleton();
+  await refresh();
+}
+
 export async function refresh() {
   const camp = getCampeonatoAtual();
-  const id   = camp?.id;
-  if (!id) return;
+  if (!camp?.id) return;
 
   try {
     const [times, jogos, classif] = await Promise.all([
-      getTimes(id),
-      getJogos(id),
-      getClassificacao(id),
+      getTimes(camp.id),
+      getJogos(camp.id),
+      getClassificacao(camp.id),
     ]);
     _jogos = jogos;
 
-    _renderHero(camp, jogos);
+    _renderProfile(camp, jogos);
     _renderStats(times, jogos);
     _renderProximos(jogos);
     _renderResultados(jogos);
     _renderClassifMini(classif);
-
   } catch (e) {
     console.error("Overview refresh error", e);
   }
 }
 
-// ── Hero ──────────────────────────────────────────────────────────────────────
+// ── Profile (capa + avatar + nome) ───────────────────────────────────────────
 
-function _renderHero(camp, jogos) {
+function _renderProfile(camp, jogos) {
   const modKey = (camp.modalidade || "").toLowerCase();
   const emoji  = SPORT_EMOJI[modKey] || "🏆";
 
-  // Watermark icon
-  const heroEl = document.getElementById("camp-hero");
-  if (heroEl) heroEl.dataset.sportIcon = emoji;
+  // Capa de fundo
+  const cover = document.getElementById("ov-cover");
+  if (cover) {
+    if (camp.capa_url) {
+      cover.style.backgroundImage = `url(${camp.capa_url})`;
+    } else {
+      cover.style.backgroundImage = "";
+    }
+  }
+
+  // Avatar / logo
+  const avatarImg   = document.getElementById("ov-avatar-img");
+  const avatarEmoji = document.getElementById("ov-avatar-emoji");
+  if (avatarImg && avatarEmoji) {
+    if (camp.logo_url) {
+      avatarImg.src = camp.logo_url;
+      avatarImg.classList.remove("hidden");
+      avatarEmoji.classList.add("hidden");
+    } else {
+      avatarImg.classList.add("hidden");
+      avatarEmoji.classList.remove("hidden");
+      avatarEmoji.textContent = emoji;
+    }
+  }
+
+  // Nome
+  const nomeEl = document.getElementById("camp-hero-nome");
+  if (nomeEl) nomeEl.textContent = camp.nome;
+
+  // Meta pills
+  const metaEl = document.getElementById("camp-hero-meta");
+  if (metaEl) {
+    const parts = [
+      camp.modalidade && `<span class="camp-hero-meta-tag"><i class="bi ${SPORT_ICON[modKey] || "bi-trophy"}"></i>${_esc(camp.modalidade)}</span>`,
+      camp.formato    && `<span class="camp-hero-meta-tag"><i class="bi bi-grid-3x3-gap"></i>${_esc(camp.formato)}</span>`,
+      camp.categoria && camp.categoria !== "Livre"
+        ? `<span class="camp-hero-meta-tag"><i class="bi bi-tag"></i>${_esc(camp.categoria)}</span>`
+        : null,
+    ].filter(Boolean);
+    metaEl.innerHTML = parts.join("");
+  }
 
   // Status badge
   const enc   = jogos.filter(j => j.status === "encerrado").length;
   const total = jogos.length;
   const live  = jogos.filter(j =>
-    ["primeiro_tempo","segundo_tempo","intervalo"].includes(j.status)).length;
+    ["primeiro_tempo", "segundo_tempo", "intervalo"].includes(j.status)).length;
 
   let cls, txt;
   if (live > 0) {
     cls = "camp-hero-badge--andamento"; txt = "Ao vivo";
   } else if (total === 0) {
     cls = "camp-hero-badge--nao-iniciado"; txt = "Não iniciado";
-  } else if (enc === total) {
+  } else if (enc === total && total > 0) {
     cls = "camp-hero-badge--finalizado"; txt = "Finalizado";
   } else {
     cls = "camp-hero-badge--andamento"; txt = "Em andamento";
@@ -70,22 +202,12 @@ function _renderHero(camp, jogos) {
   const badge = document.getElementById("camp-hero-badge");
   if (badge) { badge.className = `camp-hero-badge ${cls}`; badge.textContent = txt; }
 
-  // Nome
-  const nomeEl = document.getElementById("camp-hero-nome");
-  if (nomeEl) nomeEl.textContent = camp.nome;
-
-  // Meta row
-  const metaEl = document.getElementById("camp-hero-meta");
-  if (metaEl) {
-    const parts = [
-      camp.modalidade && `<span class="camp-hero-meta-tag">
-        <i class="bi ${SPORT_ICON[modKey] || "bi-trophy"}"></i>${camp.modalidade}</span>`,
-      camp.formato    && `<span class="camp-hero-meta-tag">${camp.formato}</span>`,
-      camp.categoria && camp.categoria !== "Livre" &&
-        `<span class="camp-hero-meta-tag">${camp.categoria}</span>`,
-    ].filter(Boolean);
-    metaEl.innerHTML = parts.join(`<span class="camp-hero-meta-sep">·</span>`);
-  }
+  // Barra de progresso
+  const pct  = total > 0 ? Math.round(enc / total * 100) : 0;
+  const fill = document.getElementById("ov-progress-fill");
+  requestAnimationFrame(() => {
+    if (fill) fill.style.width = pct + "%";
+  });
 }
 
 // ── Stats ─────────────────────────────────────────────────────────────────────
@@ -97,24 +219,26 @@ function _renderStats(times, jogos) {
   const enc  = jogos.filter(j => j.status === "encerrado").length;
   const prox = jogos.filter(j => j.status === "aguardando").length;
   const live = jogos.filter(j =>
-    ["primeiro_tempo","segundo_tempo","intervalo"].includes(j.status)).length;
-
-  const pct = jogos.length > 0 ? Math.round(enc / jogos.length * 100) : 0;
+    ["primeiro_tempo", "segundo_tempo", "intervalo"].includes(j.status)).length;
 
   el.innerHTML = `
     <div class="ov-stat">
+      <i class="bi bi-people ov-stat-icon"></i>
       <div class="ov-stat-label">Times</div>
       <div class="ov-stat-val">${times.length}</div>
     </div>
     <div class="ov-stat">
+      <i class="bi bi-calendar3 ov-stat-icon"></i>
       <div class="ov-stat-label">Jogos</div>
       <div class="ov-stat-val">${jogos.length}</div>
     </div>
     <div class="ov-stat ov-stat--accent">
+      <i class="bi bi-check2-circle ov-stat-icon"></i>
       <div class="ov-stat-label">Encerrados</div>
       <div class="ov-stat-val">${enc}</div>
     </div>
     <div class="ov-stat ${live > 0 ? "ov-stat--warn" : ""}">
+      <i class="bi bi-${live > 0 ? "broadcast" : "clock"} ov-stat-icon"></i>
       <div class="ov-stat-label">${live > 0 ? "Ao vivo" : "Aguardando"}</div>
       <div class="ov-stat-val">${live > 0 ? live : prox}</div>
     </div>`;
@@ -187,22 +311,19 @@ function _renderClassifMini(classif) {
     <div class="ov-standings">
       <div class="ov-standings-header">
         <span>#</span><span>Time</span>
-        <span>J</span><span>V</span><span>D</span><span>Pts</span>
+        <span>J</span><span>V</span><span>Pts</span>
       </div>
       ${top.map((t, i) => `
         <div class="ov-standing-row">
-          <span class="ov-standing-pos ${i < 3 ? "ov-standing-pos--top" : ""}">${i + 1}</span>
+          <span class="ov-standing-pos ov-standing-pos--${i + 1}">${i + 1}</span>
           <span class="ov-standing-name" title="${_esc(t.nome)}">${_esc(t.nome)}</span>
           <span class="ov-standing-num">${t.jogos}</span>
           <span class="ov-standing-num">${t.vitorias}</span>
-          <span class="ov-standing-num">${t.derrotas}</span>
           <span class="ov-standing-pts">${t.pontos}</span>
         </div>`).join("")}
     </div>
     <div class="ov-standings-footer">
-      <button class="ov-standings-link" id="ov-classif-btn">
-        Ver classificação completa →
-      </button>
+      <button class="ov-standings-link" id="ov-classif-btn">Ver classificação completa</button>
     </div>`;
 
   document.getElementById("ov-classif-btn")?.addEventListener("click", () => {
@@ -214,24 +335,19 @@ function _renderClassifMini(classif) {
 
 function _skeleton() {
   const el = document.getElementById("ov-stats-row");
-  if (el) el.innerHTML = [0,1,2,3].map(() => `
+  if (el) el.innerHTML = [0, 1, 2, 3].map(() => `
     <div class="ov-stat">
-      <div class="skel skel-line" style="width:48%;margin-bottom:8px"></div>
+      <div class="skel skel-line" style="width:40%;margin-bottom:10px"></div>
       <div class="skel skel-val"></div>
     </div>`).join("");
 }
 
-// ── Delegação de cliques nos match cards ──────────────────────────────────────
-
-document.addEventListener("click", e => {
-  const m = e.target.closest(".ov-match[data-id]");
-  if (!m) return;
-  const jogo = _jogos.find(j => j.id === parseInt(m.dataset.id));
-  if (jogo) abrirModal(jogo);
-});
-
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function _esc(s) {
-  return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }

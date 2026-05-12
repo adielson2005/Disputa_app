@@ -19,6 +19,8 @@ def _apply_db_migrations(app):
                 "ida_volta":      "BOOLEAN NOT NULL DEFAULT 0",
                 "formato":        "VARCHAR(50)",
                 "categoria":      "VARCHAR(50)",
+                "sub_formato":    "VARCHAR(50)",
+                "fase_inicial":   "VARCHAR(50)",
             }
             for col, typedef in new_cols.items():
                 if col not in existing:
@@ -29,10 +31,13 @@ def _apply_db_migrations(app):
         with db.engine.connect() as conn:
             existing_users = {row[1] for row in conn.execute(text("PRAGMA table_info(users)"))}
             user_cols = {
-                "google_id":     "VARCHAR(128)",
-                "nome":          "VARCHAR(120)",
-                "foto_url":      "VARCHAR(512)",
-                "auth_provider": "VARCHAR(20) NOT NULL DEFAULT 'email'",
+                "google_id":      "VARCHAR(128)",
+                "nome":           "VARCHAR(120)",
+                "foto_url":       "VARCHAR(512)",
+                "auth_provider":  "VARCHAR(20) NOT NULL DEFAULT 'email'",
+                "plano_ativo":    "BOOLEAN NOT NULL DEFAULT 0",
+                "plano_tipo":     "VARCHAR(20)",
+                "plano_validade": "DATETIME",
             }
             for col, typedef in user_cols.items():
                 if col not in existing_users:
