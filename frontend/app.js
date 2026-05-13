@@ -439,6 +439,21 @@ function _stopPolling() {
   document.getElementById("btn-logout-mobile")?.addEventListener("click", logout);
   document.getElementById("config-btn-logout")?.addEventListener("click", logout);
 
+  // Excluir conta
+  document.getElementById("config-btn-excluir-conta")?.addEventListener("click", async () => {
+    const ok = confirm(
+      "Tem certeza que deseja excluir sua conta?\n\nEsta ação é permanente e irá remover todos os seus campeonatos e dados."
+    );
+    if (!ok) return;
+    try {
+      const { deleteAccount } = await import("./services/api.js");
+      await deleteAccount();
+      logout();
+    } catch {
+      alert("Não foi possível excluir a conta. Tente novamente.");
+    }
+  });
+
   // Configurações → ir para tela Sobre
   document.getElementById("config-btn-sobre")?.addEventListener("click", () => mudarTela("sobre"));
 

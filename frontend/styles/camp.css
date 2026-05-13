@@ -3,6 +3,597 @@
    ========================================================= */
 
 /* ═══════════════════════════════════════════════════════════
+   VISÃO GERAL — Profile estilo grupo do Facebook
+   ═══════════════════════════════════════════════════════════ */
+
+/* Wrapper — sangra até a borda do content-area */
+.ov-profile {
+  margin: -28px -28px 28px;
+  position: relative;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+/* ─── Capa de fundo ────────────────────────────────────── */
+.ov-cover {
+  position: relative;
+  height: 280px;               /* mais alta, como Facebook */
+  background: #0c1220;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+  cursor: default;
+}
+
+/* Gradiente de leitura (embaixo) */
+.ov-cover-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 50%,
+    rgba(0,0,0,.38) 100%
+  );
+  pointer-events: none;
+}
+
+/* Padrão geométrico quando não há imagem */
+.ov-cover:not([style*="background-image"]) {
+  background:
+    radial-gradient(ellipse 70% 80% at 80% 120%, rgba(0,208,132,.2) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 55% at 10% -10%, rgba(99,102,241,.14) 0%, transparent 55%),
+    linear-gradient(160deg, #08090f 0%, #0e1528 100%);
+}
+
+/* Botão "Editar capa" — canto inferior direito, sempre visível mobile */
+.ov-cover-btn {
+  position: absolute;
+  bottom: 14px;
+  right: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: rgba(0,0,0,.55);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 8px;
+  color: rgba(255,255,255,.9);
+  font-size: 12.5px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background .15s, border-color .15s, opacity .15s;
+  opacity: 0;
+  min-height: unset;
+}
+.ov-cover:hover .ov-cover-btn,
+.ov-cover-btn:focus { opacity: 1; }
+.ov-cover-btn:hover {
+  background: rgba(0,0,0,.72);
+  border-color: rgba(255,255,255,.35);
+}
+.ov-cover-btn i { font-size: 14px; }
+
+/* ─── Barra de identidade (Facebook-style) ─────────────── */
+.ov-identity {
+  display: flex;
+  align-items: flex-end;          /* avatar e texto ancorados na base */
+  gap: 16px;
+  padding: 0 24px 16px;
+  position: relative;
+}
+
+/* ─── Avatar / logo ────────────────────────────────────── */
+.ov-avatar-wrap {
+  position: relative;
+  margin-top: -54px;             /* sobrepõe a capa mais que antes */
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+
+.ov-avatar {
+  width: 112px;
+  height: 112px;
+  min-width: 112px;
+  border-radius: 50%;
+  background: #1a2540;
+  border: 4px solid var(--surface);  /* borda espessa como Facebook */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0,0,0,.3);
+  position: relative;
+  aspect-ratio: 1;
+  flex-shrink: 0;
+}
+
+.ov-avatar-emoji {
+  font-size: 42px;
+  line-height: 1;
+  user-select: none;
+}
+
+.ov-avatar-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.ov-avatar-edit {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--surface);
+  box-shadow: 0 1px 4px rgba(0,0,0,.25);
+  color: var(--text-2);
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .15s, color .15s, transform .15s;
+  padding: 0;
+  min-height: unset;
+}
+.ov-avatar-edit:hover {
+  background: var(--accent);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+/* ─── Info do campeonato ───────────────────────────────── */
+.ov-identity-info {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 6px;
+}
+
+.ov-camp-nome {
+  font-size: 24px;              /* maior, como Facebook */
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -.6px;
+  line-height: 1.15;
+  margin: 0 0 8px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.ov-camp-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Meta pills */
+.camp-hero-meta-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 11.5px;
+  color: var(--muted);
+  font-weight: 500;
+}
+.camp-hero-meta-tag i { font-size: 10px; opacity: .65; }
+
+/* ─── Lado direito: ações + status ──────────────────────── */
+.ov-identity-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+  padding-bottom: 6px;
+}
+
+/* Status badge */
+.camp-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+.camp-hero-badge--andamento {
+  background: rgba(0,208,132,.1);
+  color: #00d084;
+  border: 1px solid rgba(0,208,132,.22);
+}
+.camp-hero-badge--andamento::before {
+  content: "";
+  display: inline-block;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: #00d084;
+  animation: blink 1.8s infinite;
+  flex-shrink: 0;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+.camp-hero-badge--nao-iniciado {
+  background: rgba(99,102,241,.1);
+  color: #818cf8;
+  border: 1px solid rgba(99,102,241,.22);
+}
+.camp-hero-badge--finalizado {
+  background: rgba(100,116,139,.08);
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+
+/* ─── Barra de progresso ───────────────────────────────── */
+.ov-progress-bar-wrap {
+  height: 3px;
+  background: var(--border);
+  overflow: hidden;
+}
+.ov-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), rgba(0,208,132,.5));
+  transition: width .7s cubic-bezier(.4,0,.2,1);
+}
+
+/* ─── Stats row ──────────────────────────────────────────── */
+.ov-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.ov-stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  cursor: default;
+  transition: border-color .18s, transform .2s cubic-bezier(.22,1,.36,1);
+  position: relative;
+  overflow: hidden;
+}
+.ov-stat:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+.ov-stat::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity .18s;
+}
+.ov-stat--accent::after { opacity: .5; }
+.ov-stat--warn::after   { opacity: .5; background: #f59e0b; }
+
+.ov-stat-icon {
+  font-size: 15px;
+  color: var(--faint);
+  display: block;
+  margin-bottom: 2px;
+  transition: color .18s;
+}
+.ov-stat--accent .ov-stat-icon { color: var(--accent); opacity: .7; }
+.ov-stat--warn   .ov-stat-icon { color: #f59e0b; opacity: .7; }
+.ov-stat:hover .ov-stat-icon   { color: var(--muted); }
+
+.ov-stat-label {
+  font-size: 10.5px;
+  color: var(--faint);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  white-space: nowrap;
+}
+.ov-stat-val {
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -1px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.ov-stat--warn   .ov-stat-val { color: #f59e0b; }
+.ov-stat--accent .ov-stat-val { color: var(--accent); }
+
+/* ─── Dois-colunas desktop ───────────────────────────────── */
+.ov-grid {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 14px;
+  align-items: start;
+}
+.ov-col { display: flex; flex-direction: column; gap: 14px; }
+
+/* Título das seções */
+.ov-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--faint);
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ov-section-title i { font-size: 13px; color: var(--accent); opacity: .7; }
+
+/* ─── Match cards ─────────────────────────────────────────── */
+.ov-match {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  margin: 0 -12px;
+  transition: background .12s;
+  border: 1px solid transparent;
+}
+.ov-match:last-child { margin-bottom: -10px; }
+.ov-match:hover {
+  background: var(--surface-2);
+  border-color: var(--border);
+}
+.ov-match:active { opacity: .8; }
+
+.ov-match-teams {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.ov-match-team {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ov-match-team:last-child { text-align: right; }
+.ov-match-team--winner    { font-weight: 700; color: var(--accent); }
+
+.ov-match-score {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 10px;
+  border-radius: 7px;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  white-space: nowrap;
+  min-width: 48px;
+  justify-content: center;
+}
+.ov-match-score--vs {
+  background: transparent;
+  border-color: transparent;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--faint);
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  min-width: 28px;
+}
+.ov-match-score-sep { opacity: .35; font-size: 11px; margin: 0 1px; }
+
+/* ─── Mini standings ──────────────────────────────────────── */
+.ov-standings { display: flex; flex-direction: column; }
+
+.ov-standings-header,
+.ov-standing-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 22px 22px 28px;
+  align-items: center;
+  gap: 4px;
+}
+.ov-standings-header {
+  padding: 0 0 8px;
+  border-bottom: 1px solid var(--border);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+.ov-standing-row {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  transition: background .1s;
+  border-radius: 3px;
+}
+.ov-standing-row:last-child { border-bottom: none; }
+.ov-standing-row:hover      { background: var(--surface-2); }
+
+.ov-standing-pos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--faint);
+  background: transparent;
+  flex-shrink: 0;
+}
+.ov-standing-pos--1 { background: rgba(245,158,11,.18); color: #d97706; }
+.ov-standing-pos--2 { background: rgba(148,163,184,.14); color: #94a3b8; }
+.ov-standing-pos--3 { background: rgba(180,103,77,.15); color: #b4674d; }
+.ov-standing-name   { font-size: 12.5px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ov-standing-num    { text-align: center; color: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.ov-standing-pts    {
+  text-align: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 4px;
+}
+.ov-standing-row:first-child .ov-standing-pts {
+  background: rgba(0,208,132,.1);
+  border-color: rgba(0,208,132,.2);
+  color: var(--accent);
+}
+
+.ov-standings-footer {
+  margin-top: 12px;
+  text-align: center;
+}
+.ov-standings-link {
+  font-size: 11.5px;
+  color: var(--accent);
+  cursor: pointer;
+  font-weight: 600;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  font-family: inherit;
+  padding: 6px 16px;
+  border-radius: 20px;
+  transition: background .15s, border-color .15s;
+  min-height: unset;
+}
+.ov-standings-link:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+}
+
+/* ─── Empty state ─────────────────────────────────────────── */
+.ov-empty {
+  color: var(--faint);
+  font-size: 12.5px;
+  padding: 8px 0;
+}
+
+/* ─── Skeleton ────────────────────────────────────────────── */
+@keyframes skel-shine {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skel {
+  background: linear-gradient(90deg,
+    var(--border) 25%,
+    var(--surface-2) 50%,
+    var(--border) 75%);
+  background-size: 200% 100%;
+  animation: skel-shine 1.5s infinite;
+  border-radius: 5px;
+}
+.skel-text  { height: 12px; }
+.skel-val   { height: 26px; width: 44px; border-radius: 6px; }
+.skel-line  { height: 11px; margin: 5px 0; }
+
+/* ─── Artilharia page ─────────────────────────────────────── */
+.art-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.art-row:last-child { border-bottom: none; }
+.art-rank { font-size: 18px; width: 28px; text-align: center; flex-shrink: 0; line-height: 1; }
+.art-info { flex: 1; min-width: 0; }
+.art-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.art-team { font-size: 11.5px; color: var(--faint); margin-top: 2px; }
+.art-gols-wrap { text-align: right; }
+.art-gols { font-size: 18px; font-weight: 700; color: var(--accent); letter-spacing: -.3px; line-height: 1; }
+.art-gols-label { font-size: 9.5px; color: var(--faint); text-transform: uppercase; letter-spacing: .05em; }
+
+/* ─── Avisos page ─────────────────────────────────────────── */
+.aviso-empty {
+  text-align: center;
+  padding: 40px 16px;
+  color: var(--faint);
+}
+.aviso-empty i   { font-size: 36px; margin-bottom: 10px; display: block; opacity: .5; }
+.aviso-empty p   { font-size: 13px; margin: 0; }
+.aviso-empty sub { font-size: 11px; opacity: .7; }
+
+/* ─── Regulamento / Config camp ───────────────────────────── */
+.camp-info-desc {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+.camp-config-info  { display: flex; flex-direction: column; }
+.camp-config-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--border);
+}
+.camp-config-row:last-child { border-bottom: none; }
+.camp-config-key { font-size: 13px; color: var(--muted); }
+.camp-config-val { font-size: 13px; font-weight: 600; color: var(--text); }
+
+/* ─── Responsive ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .ov-profile   { margin: -20px -16px 20px; }
+
+  /* Capa menor no mobile mas ainda impactante */
+  .ov-cover     { height: 190px; }
+  .ov-cover-btn { opacity: 1 !important; } /* sempre visível no mobile */
+
+  /* Avatar menor e mais proporcional */
+  .ov-avatar-wrap { margin-top: -42px; }
+  .ov-avatar    { width: 84px; height: 84px; min-width: 84px; border-width: 3px; }
+  .ov-avatar-emoji { font-size: 32px; }
+
+  .ov-identity  { padding: 0 14px 14px; gap: 12px; }
+  .ov-camp-nome { font-size: 18px; }
+  .ov-identity-actions { display: none; } /* badge fica oculto no mobile — já aparece na topbar */
+
+  /* Stats: 2×2 no mobile */
+  .ov-stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .ov-stat      { padding: 12px 14px 10px; }
+  .ov-stat-val  { font-size: 26px; }
+  .ov-grid      { grid-template-columns: 1fr; gap: 12px; }
+}
+
+/* ═══════════════════════════════════════════════════════════
    VISÃO GERAL — Hero estilo profile (capa + avatar)
    ═══════════════════════════════════════════════════════════ */
 

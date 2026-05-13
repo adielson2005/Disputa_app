@@ -3,6 +3,8 @@ import re
 from flask import Blueprint, jsonify, request, current_app
 
 from extensions import db
+from middleware.auth import require_auth
+from models.campeonato import Campeonato
 from models.user import User
 from services.auth_service import gerar_token
 
@@ -81,6 +83,19 @@ def register():
     db.session.commit()
 
     return jsonify(_emit_token(user)), 201
+
+
+@auth_bp.route("/user", methods=["DELETE"])
+@require_auth
+def delete_account(user_id):
+    user = User.query.get(user_id)
+    if not user or user.deletado:
+        return jsonify({"erro": "Usuário não encontrado"}), 404
+    # Soft-delete de todos os campeonatos do usuário
+    Campeonato.query.filter_by(user_id=user_id, deletado=False).update({"deletado": True})
+    user.deletado = True
+    db.session.commit()
+    return jsonify({"mensagem": "Conta excluída com sucesso"}), 200
 
 
 @auth_bp.route("/login", methods=["POST"])

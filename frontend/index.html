@@ -18,6 +18,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="styles/main.css">
   <link rel="stylesheet" href="styles/camp.css">
+  <link rel="stylesheet" href="styles/golapp-v4.css">
   <!-- Google Identity Services SDK -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <!-- Aplica tema antes do render para evitar flash -->
@@ -455,8 +456,9 @@
       <!-- Visão Geral (contexto campeonato) -->
       <div id="overview" class="tela">
 
-        <!-- Capa + identidade (estilo profile) -->
+        <!-- Capa + identidade (estilo perfil — inspirado em grupos do Facebook) -->
         <div class="ov-profile">
+
           <!-- Capa de fundo -->
           <div class="ov-cover" id="ov-cover">
             <div class="ov-cover-overlay"></div>
@@ -466,9 +468,10 @@
             </button>
           </div>
 
-          <!-- Barra de identidade: avatar + nome + meta + status -->
+          <!-- Barra de identidade: avatar + info + ações (Facebook-style) -->
           <div class="ov-identity">
-            <!-- Avatar / logo do campeonato -->
+
+            <!-- Avatar / logo do campeonato (sobrepõe a capa) -->
             <div class="ov-avatar-wrap" id="ov-avatar-wrap">
               <div class="ov-avatar" id="ov-avatar">
                 <span class="ov-avatar-emoji" id="ov-avatar-emoji">🏆</span>
@@ -479,14 +482,16 @@
               </button>
             </div>
 
-            <!-- Info do campeonato -->
+            <!-- Nome + meta pills -->
             <div class="ov-identity-info">
               <h1 class="ov-camp-nome" id="camp-hero-nome">&mdash;</h1>
               <div class="ov-camp-meta" id="camp-hero-meta"></div>
             </div>
 
-            <!-- Badge de status (canto direito) -->
-            <span class="camp-hero-badge camp-hero-badge--nao-iniciado" id="camp-hero-badge">N&atilde;o iniciado</span>
+            <!-- Lado direito: badge de status -->
+            <div class="ov-identity-actions">
+              <span class="camp-hero-badge camp-hero-badge--nao-iniciado" id="camp-hero-badge">N&atilde;o iniciado</span>
+            </div>
           </div>
 
           <!-- Barra de progresso sutil -->
@@ -629,6 +634,13 @@
               <div class="config-row-icon"><i class="bi bi-box-arrow-right"></i></div>
               <div class="config-row-body">
                 <div class="config-row-label">Sair da conta</div>
+              </div>
+            </div>
+            <div class="config-row config-row-danger" id="config-btn-excluir-conta">
+              <div class="config-row-icon"><i class="bi bi-trash3"></i></div>
+              <div class="config-row-body">
+                <div class="config-row-label">Excluir conta</div>
+                <div class="config-row-sub">Remove permanentemente sua conta e dados</div>
               </div>
             </div>
           </div>
