@@ -1,22 +1,27 @@
 from flask import Blueprint, jsonify, request
+from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError
 
 from extensions import db
 from middleware.auth import require_auth
 from models.times import Time
+from schemas.time_schema import TimeSchema
 from services.campeonato_service import get_ou_403
 
 time_bp = Blueprint("time", __name__)
+_time_schema = TimeSchema()
 
 
 @time_bp.route("/times", methods=["POST"])
 @require_auth
 def criar_time(user_id):
-    data = request.json or {}
-    campeonato_id = data.get("campeonato_id")
-    if not data.get("nome") or not campeonato_id:
-        return jsonify({"erro": "Nome e campeonato_id são obrigatórios"}), 400
+    raw = request.get_json(silent=True) or {}
+    try:
+        data = _time_schema.load(raw)
+    except ValidationError as exc:
+        return jsonify({"erro": "Dados inválidos", "detalhes": exc.messages}), 400
 
+    campeonato_id = data["campeonato_id"]
     # Garante que o campeonato pertence ao usuário autenticado
     get_ou_403(campeonato_id, user_id)
 

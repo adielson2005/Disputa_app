@@ -1,34 +1,39 @@
 from flask import Blueprint, jsonify, request
+from marshmallow import ValidationError
 from sqlalchemy.exc import IntegrityError
 
 from extensions import db
 from middleware.auth import require_auth
 from models.campeonato import Campeonato
 from models.jogo import Jogo
+from schemas.campeonato_schema import CampeonatoSchema
 from services.campeonato_service import get_ou_403
 
 campeonato_bp = Blueprint("campeonato", __name__)
+_campeonato_schema = CampeonatoSchema()
 
 
 @campeonato_bp.route("/campeonatos", methods=["POST"])
 @require_auth
 def criar_campeonato(user_id):
-    data = request.json or {}
-    if not data.get("nome") or not data.get("modalidade"):
-        return jsonify({"erro": "Nome e modalidade são obrigatórios"}), 400
+    raw = request.get_json(silent=True) or {}
+    try:
+        data = _campeonato_schema.load(raw)
+    except ValidationError as exc:
+        return jsonify({"erro": "Dados inválidos", "detalhes": exc.messages}), 400
 
     c = Campeonato(
         nome           = data["nome"],
         modalidade     = data["modalidade"],
         user_id        = user_id,
-        descricao      = data.get("descricao") or None,
-        duracao_padrao = int(data.get("duracao_padrao") or 45),
-        pontos_vitoria = int(data.get("pontos_vitoria") or 3),
-        ida_volta      = bool(data.get("ida_volta", False)),
-        formato        = data.get("formato")      or None,
-        categoria      = data.get("categoria")     or None,
-        sub_formato    = data.get("sub_formato")   or None,
-        fase_inicial   = data.get("fase_inicial")  or None,
+        descricao      = data["descricao"],
+        duracao_padrao = data["duracao_padrao"],
+        pontos_vitoria = data["pontos_vitoria"],
+        ida_volta      = data["ida_volta"],
+        formato        = data["formato"],
+        categoria      = data["categoria"],
+        sub_formato    = data["sub_formato"],
+        fase_inicial   = data["fase_inicial"],
     )
     db.session.add(c)
     try:

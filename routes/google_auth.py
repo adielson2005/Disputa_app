@@ -17,7 +17,6 @@ from flask import Blueprint, jsonify, request, current_app
 
 from extensions import db
 from models.user import User
-from services.auth_service import gerar_token
 from routes.auth import _emit_token
 
 google_auth_bp = Blueprint("google_auth", __name__)

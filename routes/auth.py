@@ -1,12 +1,12 @@
 import re
 
-from flask import Blueprint, jsonify, request, current_app
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import create_access_token
 
 from extensions import db
 from middleware.auth import require_auth
 from models.campeonato import Campeonato
 from models.user import User
-from services.auth_service import gerar_token
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -42,11 +42,7 @@ def _validar_senha(senha: str) -> str | None:
 
 
 def _emit_token(user: User) -> dict:
-    token = gerar_token(
-        user.id,
-        current_app.config["JWT_SECRET"],
-        current_app.config["JWT_EXPIRATION_HOURS"],
-    )
+    token = create_access_token(identity=str(user.id))
     return {
         "token":          token,
         "id":             user.id,
