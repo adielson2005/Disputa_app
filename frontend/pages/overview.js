@@ -1,4 +1,4 @@
-// ── Página: Visão Geral do Campeonato ────────────────────────────────────────
+﻿// ── Página: Visão Geral do Campeonato ────────────────────────────────────────
 import { getTimes, getJogos, getClassificacao, updateCampeonatoImagem } from "../services/api.js";
 import { getCampeonatoAtual, setCampeonatoAtual } from "../store.js";
 import { abrir as abrirModal } from "../components/modal.js";
@@ -327,7 +327,7 @@ function _renderClassifMini(classif) {
     </div>`;
 
   document.getElementById("ov-classif-btn")?.addEventListener("click", () => {
-    document.dispatchEvent(new CustomEvent("golapp:navegar", { detail: "classificacao" }));
+    document.dispatchEvent(new CustomEvent("disputaapp:navegar", { detail: "classificacao" }));
   });
 }
 

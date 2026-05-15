@@ -1,5 +1,5 @@
-"""
-Mixins compartilhados pelos models do GolApp.
+﻿"""
+Mixins compartilhados pelos models do DisputaApp.
 
 TimestampMixin  — created_at / updated_at em UTC
 SoftDeleteMixin — deletado (boolean) em vez de DELETE físico

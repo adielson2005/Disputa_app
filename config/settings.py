@@ -1,4 +1,4 @@
-import os
+﻿import os
 import secrets
 
 try:
@@ -13,7 +13,7 @@ def _require_env(name: str) -> str:
     value = os.environ.get(name, "").strip()
     if not value:
         raise RuntimeError(
-            f"[GolApp] Variável de ambiente obrigatória não definida: {name}\n"
+            f"[DisputaApp] Variável de ambiente obrigatória não definida: {name}\n"
             f"  → Crie um arquivo .env baseado em .env.example e defina {name}."
         )
     return value
@@ -27,7 +27,7 @@ class BaseConfig:
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DEV_DATABASE_URL", "sqlite:///golapp.db"
+        "DEV_DATABASE_URL", "sqlite:///disputaapp.db"
     ).replace("postgres://", "postgresql://", 1)
     JWT_SECRET = os.environ.get("JWT_SECRET") or secrets.token_hex(32)
     SECRET_KEY = os.environ.get("SECRET_KEY") or secrets.token_hex(32)

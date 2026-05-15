@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-br" data-theme="light">
 <head>
   <meta charset="UTF-8">
@@ -6,9 +6,9 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="theme-color" content="#10b981" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#09090b" media="(prefers-color-scheme: dark)">
-  <title>GolApp</title>
+  <meta name="theme-color" content="#00c97a" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0a0a0f" media="(prefers-color-scheme: dark)">
+  <title>DisputaApp</title>
   <link rel="icon" href="data:,">
   <!-- Google OAuth Client ID — substitua pelo seu na produção -->
   <meta name="google-client-id" content="">
@@ -16,16 +16,16 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/disputaapp-v4.css">
   <link rel="stylesheet" href="styles/camp.css">
-  <link rel="stylesheet" href="styles/golapp-v4.css">
+  <link rel="stylesheet" href="styles/main.css">
   <!-- Google Identity Services SDK -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <!-- Aplica tema antes do render para evitar flash -->
   <script>
     document.documentElement.setAttribute(
       "data-theme",
-      localStorage.getItem("golapp-theme") || "light"
+      localStorage.getItem("disputaapp-theme") || "light"
     );
   </script>
   <!-- Google Client ID (injetado pelo backend via meta tag ou variável global) -->
@@ -46,11 +46,11 @@
     <div class="login-panel-left">
       <div class="login-left-inner">
         <div class="login-wordmark">
-          <span class="login-wordmark-dot"></span>GolApp
+          <span class="login-wordmark-dot"></span>DisputaApp
         </div>
-        <p class="login-tagline">Campeonatos organizados.<br>Resultados em tempo real.</p>
+        <p class="login-tagline">Monte a chave. Acompanhe cada rodada.</p>
         <div class="login-left-divider"></div>
-        <p class="login-left-caption">Gerencie times, jogos e classifica&ccedil;&atilde;o — tudo em um lugar.</p>
+        <p class="login-left-caption">Times, jogos, s&uacute;mulas e classifica&ccedil;&atilde;o organizados em um s&oacute; lugar.</p>
       </div>
     </div>
 
@@ -135,11 +135,14 @@
 
   </div>
 
+  <!-- ── SIDEBAR OVERLAY (mobile) ───────────────────────────────────── -->
+  <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
   <!-- ── SIDEBAR ────────────────────────────────────────────────────── -->
   <div class="sidebar">
     <div class="sidebar-logo">
       <span class="sidebar-logo-dot"></span>
-      GolApp
+      DisputaApp
     </div>
 
     <div class="sidebar-user" id="user-strip">
@@ -234,6 +237,9 @@
   <!-- ── CONTENT ────────────────────────────────────────────────────── -->
   <div class="content">
     <div class="topbar">
+      <button class="topbar-menu-btn" id="btn-sidebar-toggle" aria-label="Menu">
+        <i class="bi bi-list"></i>
+      </button>
       <button class="topbar-back-btn" id="btn-topbar-voltar" style="display:none" aria-label="Voltar">
         <i class="bi bi-arrow-left"></i>
       </button>
@@ -668,7 +674,7 @@
             <div class="config-row" id="config-btn-sobre">
               <div class="config-row-icon"><i class="bi bi-info-circle"></i></div>
               <div class="config-row-body">
-                <div class="config-row-label">GolApp</div>
+                <div class="config-row-label">DisputaApp</div>
                 <div class="config-row-sub" id="config-versao-sub">Vers&atilde;o 1.0.0</div>
               </div>
               <i class="bi bi-chevron-right config-row-arrow"></i>
@@ -682,13 +688,13 @@
       <div id="sobre" class="tela">
         <div class="sobre-hero">
           <div class="sobre-logo">&#9917;</div>
-          <div class="sobre-nome">GolApp</div>
+          <div class="sobre-nome">DisputaApp</div>
           <div class="sobre-versao">Vers&atilde;o 1.0.0</div>
         </div>
 
         <div class="card">
-          <div class="card-title">O que &eacute; o GolApp?</div>
-          <p class="sobre-desc">GolApp &eacute; uma plataforma para gerenciar campeonatos amadores e semiprofissionais. Controle times, placar em tempo real e classifica&ccedil;&atilde;o autom&aacute;tica, tudo em um s&oacute; lugar.</p>
+          <div class="card-title">O que &eacute; o DisputaApp?</div>
+          <p class="sobre-desc">DisputaApp &eacute; uma plataforma para gerenciar campeonatos amadores e semiprofissionais. Controle times, placar em tempo real e classifica&ccedil;&atilde;o autom&aacute;tica, tudo em um s&oacute; lugar.</p>
         </div>
 
         <div class="card">
@@ -706,8 +712,8 @@
             <a href="https://tiktok.com" target="_blank" rel="noopener" class="sobre-link">
               <i class="bi bi-tiktok"></i><span>TikTok</span><i class="bi bi-box-arrow-up-right sobre-link-ext"></i>
             </a>
-            <a href="mailto:contato@golapp.com" class="sobre-link">
-              <i class="bi bi-envelope-fill"></i><span>contato@golapp.com</span><i class="bi bi-box-arrow-up-right sobre-link-ext"></i>
+            <a href="mailto:contato@disputaapp.com" class="sobre-link">
+              <i class="bi bi-envelope-fill"></i><span>contato@disputaapp.com</span><i class="bi bi-box-arrow-up-right sobre-link-ext"></i>
             </a>
           </div>
         </div>
@@ -723,14 +729,14 @@
           </div>
         </div>
 
-        <p class="sobre-copy">&copy; 2026 GolApp. Todos os direitos reservados.</p>
+        <p class="sobre-copy">&copy; 2026 DisputaApp. Todos os direitos reservados.</p>
       </div>
 
       <!-- Planos -->
       <div id="planos" class="tela">
 
         <div class="planos-hero">
-          <div class="planos-hero-badge">GolApp Pro</div>
+          <div class="planos-hero-badge">DisputaApp Pro</div>
           <h2 class="planos-hero-title">Escolha seu plano</h2>
           <p class="planos-hero-sub">Gerencie campeonatos com mais liberdade. Cancele quando quiser.</p>
         </div>
@@ -875,7 +881,7 @@
     <div class="mais-sheet" id="mais-sheet" role="dialog" aria-label="Mais opções">
       <div class="mais-sheet-handle"></div>
       <div class="mais-sheet-title">Mais opções</div>
-      <div class="mais-sheet-grid">
+      <div class="mais-sheet-items">
         <button class="mais-sheet-item" data-tela="artilharia">
           <i class="bi bi-lightning-fill"></i><span>Artilharia</span>
         </button>

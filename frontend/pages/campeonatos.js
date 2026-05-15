@@ -1,4 +1,4 @@
-// ── Página: Campeonatos ───────────────────────────────────────────────────────
+﻿// ── Página: Campeonatos ───────────────────────────────────────────────────────
 import { getCampeonatos, createCampeonato, deleteCampeonato } from "../services/api.js";
 import { getUsuario } from "../store.js";
 import { confirmar, notificar } from "../components/ui.js";
@@ -142,7 +142,7 @@ export function init() {
     if (!item) return;
     const camp = _lista.find(c => c.id === parseInt(item.dataset.id));
     if (camp)
-      document.dispatchEvent(new CustomEvent("golapp:abrir-campeonato", { detail: camp }));
+      document.dispatchEvent(new CustomEvent("disputaapp:abrir-campeonato", { detail: camp }));
   });
 }
 
@@ -237,7 +237,7 @@ async function _executarCriacao() {
     if (subPill) subPill.innerHTML = `<i class="bi bi-person-badge"></i>&nbsp;Sub...`;
     _fecharPainel();
     await _renderLista();
-    document.dispatchEvent(new CustomEvent("golapp:campeonatos-updated"));
+    document.dispatchEvent(new CustomEvent("disputaapp:campeonatos-updated"));
     notificar("Campeonato criado! (" + preco + ")", "sucesso");
   } catch (err) {
     console.error("Erro ao criar campeonato", err);
@@ -266,7 +266,7 @@ async function _confirmarDelecao(id) {
   try {
     await deleteCampeonato(id);
     await _renderLista();
-    document.dispatchEvent(new CustomEvent("golapp:campeonatos-updated"));
+    document.dispatchEvent(new CustomEvent("disputaapp:campeonatos-updated"));
   } catch (e) {
     console.error("Erro ao deletar", e);
     if (itemEl) itemEl.classList.remove("campeonato-item--deleting");

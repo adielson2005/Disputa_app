@@ -1,5 +1,5 @@
-/* =========================================================
-   camp.css — Estilos do contexto de campeonato (GolApp)
+﻿/* =========================================================
+   camp.css — Estilos do contexto de campeonato (DisputaApp)
    ========================================================= */
 
 /* ═══════════════════════════════════════════════════════════
@@ -8,10 +8,15 @@
 
 /* Wrapper — sangra até a borda do content-area */
 .ov-profile {
-  margin: -28px -28px 28px;
+  margin: -24px -28px 28px;
   position: relative;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
+}
+@media (max-width: 768px) {
+  .ov-profile {
+    margin: -16px -16px 20px;
+  }
 }
 
 /* ─── Capa de fundo ────────────────────────────────────── */

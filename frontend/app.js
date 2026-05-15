@@ -1,4 +1,4 @@
-// ── Orquestrador principal do GolApp ─────────────────────────────────────────
+﻿// ── Orquestrador principal do DisputaApp ─────────────────────────────────────────
 import { getUsuario, getToken, clearAuth, setCampeonatoAtual, getCampeonatoAtual } from "./store.js";
 import { init as initAuth, mostrar as mostrarAuth }                   from "./pages/auth.js";
 import { init as initDashboard, load as loadDashboard,
@@ -32,7 +32,7 @@ const _LABEL = {
   regulamento:    "Regulamento",
   "config-camp":  "Configura\u00e7\u00f5es",
   configuracoes:  "Configura\u00e7\u00f5es",
-  sobre:          "Sobre o GolApp",
+  sobre:          "Sobre o DisputaApp",
 };
 
 function mudarTela(id) {
@@ -290,7 +290,7 @@ function _initConfigHandlers() {
       const blob  = new Blob([JSON.stringify(lista, null, 2)], { type: "application/json" });
       const url   = URL.createObjectURL(blob);
       const a     = document.createElement("a");
-      a.href = url; a.download = "golapp-campeonatos.json"; a.click();
+      a.href = url; a.download = "disputaapp-campeonatos.json"; a.click();
       URL.revokeObjectURL(url);
     } catch { /* silencioso */ }
   });
@@ -301,7 +301,7 @@ function toggleTema() {
   const atual = document.documentElement.getAttribute("data-theme");
   const novo  = atual === "dark" ? "light" : "dark";
   document.documentElement.setAttribute("data-theme", novo);
-  localStorage.setItem("golapp-theme", novo);
+  localStorage.setItem("disputaapp-theme", novo);
   _syncTema(novo);
 }
 
@@ -379,7 +379,7 @@ function _stopPolling() {
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 (function init() {
   // Tema (sem flash — o atributo data-theme já foi definido no <head>)
-  const tema = localStorage.getItem("golapp-theme") || "light";
+  const tema = localStorage.getItem("disputaapp-theme") || "light";
   _syncTema(tema);
 
   // Remover service worker legado
@@ -420,12 +420,12 @@ function _stopPolling() {
   });
 
   // Contexto de campeonato
-  document.addEventListener("golapp:abrir-campeonato", e => abrirContextoCampeonato(e.detail));
+  document.addEventListener("disputaapp:abrir-campeonato", e => abrirContextoCampeonato(e.detail));
   document.getElementById("btn-voltar-geral")?.addEventListener("click", voltarContextoGeral);
   document.getElementById("btn-topbar-voltar")?.addEventListener("click", voltarContextoGeral);
 
   // Navegação interna (disparada por sub-componentes)
-  document.addEventListener("golapp:navegar", e => mudarTela(e.detail));
+  document.addEventListener("disputaapp:navegar", e => mudarTela(e.detail));
 
   // Toggle de visibilidade de senha
   _initPasswordToggles();
@@ -433,6 +433,28 @@ function _stopPolling() {
   // Tema
   document.getElementById("theme-btn")?.addEventListener("click", toggleTema);
   document.getElementById("theme-btn-topbar")?.addEventListener("click", toggleTema);
+
+  // Sidebar mobile toggle
+  const sidebar      = document.querySelector(".sidebar");
+  const sidebarOverlay = document.getElementById("sidebar-overlay");
+  function openSidebar() {
+    sidebar?.classList.add("open");
+    sidebarOverlay?.classList.add("open");
+    sidebarOverlay?.removeAttribute("aria-hidden");
+  }
+  function closeSidebar() {
+    sidebar?.classList.remove("open");
+    sidebarOverlay?.classList.remove("open");
+    sidebarOverlay?.setAttribute("aria-hidden", "true");
+  }
+  document.getElementById("btn-sidebar-toggle")?.addEventListener("click", openSidebar);
+  sidebarOverlay?.addEventListener("click", closeSidebar);
+  // Fecha a sidebar ao navegar em mobile
+  document.querySelectorAll(".nav-item[data-tela], .bottom-nav-item[data-tela]").forEach(el => {
+    el.addEventListener("click", () => {
+      if (window.innerWidth <= 768) closeSidebar();
+    });
+  });
 
   // Logout
   document.getElementById("btn-logout")?.addEventListener("click", logout);
@@ -505,10 +527,10 @@ function _stopPolling() {
   document.getElementById("btn-cancelar-plano")?.addEventListener("click", _cancelarPlano);
 
   // Escutar evento de campeonatos criados (disparado por campeonatos.js)
-  document.addEventListener("golapp:campeonatos-updated", () => loadDashboard());
+  document.addEventListener("disputaapp:campeonatos-updated", () => loadDashboard());
 
   // Token expirado ou inválido → logout automático
-  document.addEventListener("golapp:unauthorized", () => {
+  document.addEventListener("disputaapp:unauthorized", () => {
     if (getToken()) logout();
   });
 

@@ -1,9 +1,9 @@
-// ── Gerenciamento de estado global da aplicação ──────────────────────────────
+﻿// ── Gerenciamento de estado global da aplicação ──────────────────────────────
 // Token e usuário são persistidos no localStorage para restauração de sessão.
 
 const _s = {
-  usuario: JSON.parse(localStorage.getItem("golapp_usuario") || "null"),
-  token:   localStorage.getItem("golapp_token") || null,
+  usuario: JSON.parse(localStorage.getItem("disputaapp_usuario") || "null"),
+  token:   localStorage.getItem("disputaapp_token") || null,
   campeonatoAtual: null, // { id, nome, modalidade }
 };
 
@@ -15,15 +15,15 @@ export const getCampeonatoAtual = () => _s.campeonatoAtual;
 export function setAuth(usuario, token) {
   _s.usuario = usuario;
   _s.token   = token;
-  localStorage.setItem("golapp_token",   token);
-  localStorage.setItem("golapp_usuario", JSON.stringify(usuario));
+  localStorage.setItem("disputaapp_token",   token);
+  localStorage.setItem("disputaapp_usuario", JSON.stringify(usuario));
 }
 
 export function clearAuth() {
   _s.usuario = null;
   _s.token   = null;
-  localStorage.removeItem("golapp_token");
-  localStorage.removeItem("golapp_usuario");
+  localStorage.removeItem("disputaapp_token");
+  localStorage.removeItem("disputaapp_usuario");
 }
 
 export function setCampeonatoAtual(campeonato) {

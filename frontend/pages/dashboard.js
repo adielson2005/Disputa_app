@@ -1,4 +1,4 @@
-// ── Página: Dashboard ─────────────────────────────────────────────────────────
+﻿// ── Página: Dashboard ─────────────────────────────────────────────────────────
 import { getCampeonatos } from "../services/api.js";
 import { getUsuario } from "../store.js";
 
@@ -25,7 +25,7 @@ export function init() {
     if (!card) return;
     const camp = _campeonatos.find(c => c.id === parseInt(card.dataset.id));
     if (camp)
-      document.dispatchEvent(new CustomEvent("golapp:abrir-campeonato", { detail: camp }));
+      document.dispatchEvent(new CustomEvent("disputaapp:abrir-campeonato", { detail: camp }));
   });
 }
 

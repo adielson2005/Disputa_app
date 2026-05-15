@@ -1,4 +1,4 @@
-// ── Camada de comunicação com a API ──────────────────────────────────────────
+﻿// ── Camada de comunicação com a API ──────────────────────────────────────────
 // Todos os endpoints estão sob /api (prefixo definido nos blueprints Flask).
 
 const BASE = "/api";
@@ -6,7 +6,7 @@ const BASE = "/api";
 function _authHeaders() {
   return {
     "Content-Type": "application/json",
-    "Authorization": `Bearer ${localStorage.getItem("golapp_token") || ""}`,
+    "Authorization": `Bearer ${localStorage.getItem("disputaapp_token") || ""}`,
   };
 }
 
@@ -19,7 +19,7 @@ async function _req(method, path, body = null, auth = false) {
   if (!res.ok) {
     // Token expirado/inválido → notifica o app para fazer logout
     if (res.status === 401 && auth) {
-      document.dispatchEvent(new CustomEvent("golapp:unauthorized"));
+      document.dispatchEvent(new CustomEvent("disputaapp:unauthorized"));
     }
     throw { status: res.status, ...data };
   }
