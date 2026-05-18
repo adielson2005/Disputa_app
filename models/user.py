@@ -13,7 +13,7 @@ class User(TimestampMixin, SoftDeleteMixin, db.Model):
     # OAuth Google
     google_id   = db.Column(db.String(128), unique=True, nullable=True, index=True)
     nome        = db.Column(db.String(120), nullable=True)
-    foto_url    = db.Column(db.String(512), nullable=True)
+    foto_url    = db.Column(db.Text, nullable=True)
     auth_provider = db.Column(db.String(20), nullable=False, default="email")
     # Assinatura
     plano_ativo    = db.Column(db.Boolean, default=False, nullable=False)

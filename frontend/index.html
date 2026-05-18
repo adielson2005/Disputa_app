@@ -15,10 +15,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="styles/disputaapp-v4.css">
   <link rel="stylesheet" href="styles/camp.css">
   <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="/assets/css/style.css">
   <!-- Google Identity Services SDK -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <!-- Aplica tema antes do render para evitar flash -->
@@ -39,6 +42,13 @@
   </script>
 </head>
 <body>
+
+  <div id="loading-screen">
+    <div class="loader-wrapper">
+      <div class="loader-ball"></div>
+      <h4>Disputa App</h4>
+    </div>
+  </div>
 
   <!-- ── LOGIN ──────────────────────────────────────────────────────── -->
   <div id="login-overlay">
@@ -146,7 +156,7 @@
     </div>
 
     <div class="sidebar-user" id="user-strip">
-      <span class="sidebar-user-avatar"><i class="bi bi-person-fill"></i></span>
+      <div class="user-avatar-initial user-avatar-initial--sm" id="sidebar-avatar">?</div>
       <span class="sidebar-user-email" id="user-email"></span>
       <button id="btn-logout">Sair</button>
     </div>
@@ -163,9 +173,6 @@
         <div class="nav-item" data-tela="planos">
           <i class="bi bi-gem nav-icon"></i><span>Planos</span>
         </div>
-
-        <div class="sidebar-section-label">Geral</div>
-
         <div class="nav-item" data-tela="configuracoes">
           <i class="bi bi-sliders2 nav-icon"></i><span>Configura&ccedil;&otilde;es</span>
         </div>
@@ -173,8 +180,6 @@
           <i class="bi bi-info-circle-fill nav-icon"></i><span>Sobre</span>
         </div>
       </nav>
-
-      <!-- Redes sociais removidas daqui — estão na página Sobre -->
     </div>
 
     <!-- ─ Menu: contexto campeonato ─ -->
@@ -188,11 +193,8 @@
       </div>
       <nav class="sidebar-nav">
         <div class="nav-item" data-tela="overview">
-          <i class="bi bi-grid-fill nav-icon"></i><span>Vis&atilde;o Geral</span>
+          <i class="bi bi-house-fill nav-icon"></i><span>Vis&atilde;o Geral</span>
         </div>
-
-        <div class="sidebar-section-label">Competi&ccedil;&atilde;o</div>
-
         <div class="nav-item" data-tela="times">
           <i class="bi bi-people-fill nav-icon"></i><span>Times</span>
         </div>
@@ -202,37 +204,72 @@
         <div class="nav-item" data-tela="classificacao">
           <i class="bi bi-list-ol nav-icon"></i><span>Classifica&ccedil;&atilde;o</span>
         </div>
-        <div class="nav-item" data-tela="artilharia">
-          <i class="bi bi-lightning-fill nav-icon"></i><span>Artilharia</span>
-        </div>
-
-        <div class="sidebar-section-label">An&aacute;lise</div>
-
-        <div class="nav-item" data-tela="estatisticas">
-          <i class="bi bi-graph-up-arrow nav-icon"></i><span>Estat&iacute;sticas</span>
-        </div>
-
-        <div class="sidebar-section-label">Informa&ccedil;&otilde;es</div>
-
-        <div class="nav-item" data-tela="avisos">
-          <i class="bi bi-megaphone-fill nav-icon"></i><span>Avisos</span>
-        </div>
-        <div class="nav-item" data-tela="regulamento">
-          <i class="bi bi-file-text-fill nav-icon"></i><span>Regulamento</span>
-        </div>
-        <div class="nav-item" data-tela="config-camp">
-          <i class="bi bi-sliders2 nav-icon"></i><span>Configura&ccedil;&otilde;es</span>
+        <div class="nav-item" id="sb-btn-mais-camp">
+          <i class="bi bi-grid-3x3-gap-fill nav-icon"></i><span>Mais</span>
         </div>
       </nav>
     </div>
 
-    <div class="sidebar-bottom">
-      <button class="theme-btn" id="theme-btn">
-        <i id="theme-icon" class="bi bi-moon-stars-fill"></i>
-        <span id="theme-label">Modo escuro</span>
-      </button>
-    </div>
   </div>
+
+  <!-- ── SIDEBAR DESKTOP ─────────────────────────────────────────────── -->
+  <aside class="desktop-sidebar">
+
+    <div class="sidebar-logo">
+      <i class="bi bi-trophy-fill"></i>
+      <span>Disputa</span>
+    </div>
+
+    <!-- Contexto geral -->
+    <div id="ds-menu-geral" class="sidebar-menu">
+      <nav class="sidebar-nav">
+        <div class="nav-item ativo" data-tela="dashboard">
+          <i class="bi bi-grid-fill nav-icon"></i><span>Dashboard</span>
+        </div>
+        <div class="nav-item" data-tela="campeonatos">
+          <i class="bi bi-trophy-fill nav-icon"></i><span>Campeonatos</span>
+        </div>
+        <div class="nav-item" data-tela="planos">
+          <i class="bi bi-gem nav-icon"></i><span>Planos</span>
+        </div>
+        <div class="nav-item" data-tela="configuracoes">
+          <i class="bi bi-sliders2 nav-icon"></i><span>Configura&ccedil;&otilde;es</span>
+        </div>
+        <div class="nav-item" data-tela="sobre">
+          <i class="bi bi-info-circle-fill nav-icon"></i><span>Sobre</span>
+        </div>
+      </nav>
+    </div>
+
+    <!-- Contexto campeonato -->
+    <div id="ds-menu-camp" class="sidebar-menu" style="display:none">
+      <div class="sidebar-ctx-header">
+        <button class="sidebar-back-btn" id="ds-btn-voltar-geral">
+          <i class="bi bi-arrow-left"></i> Voltar
+        </button>
+        <div class="sidebar-ctx-badge" id="ds-ctx-modalidade"></div>
+        <div class="sidebar-ctx-name" id="ds-ctx-nome">&mdash;</div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-item" data-tela="overview">
+          <i class="bi bi-house-fill nav-icon"></i><span>Vis&atilde;o Geral</span>
+        </div>
+        <div class="nav-item" data-tela="times">
+          <i class="bi bi-people-fill nav-icon"></i><span>Times</span>
+        </div>
+        <div class="nav-item" data-tela="jogos">
+          <i class="bi bi-calendar-check-fill nav-icon"></i><span>Jogos</span>
+        </div>
+        <div class="nav-item" data-tela="classificacao">
+          <i class="bi bi-list-ol nav-icon"></i><span>Classifica&ccedil;&atilde;o</span>
+        </div>
+        <div class="nav-item" id="ds-btn-mais-camp">
+          <i class="bi bi-grid-3x3-gap-fill nav-icon"></i><span>Mais</span>
+        </div>
+      </nav>
+    </div>
+
+  </aside>
 
   <!-- ── CONTENT ────────────────────────────────────────────────────── -->
   <div class="content">
@@ -243,14 +280,21 @@
       <button class="topbar-back-btn" id="btn-topbar-voltar" style="display:none" aria-label="Voltar">
         <i class="bi bi-arrow-left"></i>
       </button>
-      <span class="topbar-title" id="topbar-title">Dashboard</span>
+      <div class="topbar-title-wrap">
+        <div class="topbar-title" id="topbar-title">Dashboard</div>
+        <div class="topbar-subtitle">Disputa App</div>
+      </div>
       <div class="topbar-actions">
-        <button class="topbar-icon-btn" id="theme-btn-topbar" aria-label="Alternar tema">
-          <i id="theme-icon-topbar" class="bi bi-moon-stars-fill"></i>
+        <button class="topbar-icon-btn" aria-label="Buscar">
+          <i class="bi bi-search"></i>
+        </button>
+        <button class="topbar-icon-btn" aria-label="Notifica&ccedil;&otilde;es">
+          <i class="bi bi-bell"></i>
         </button>
         <button class="topbar-icon-btn" id="btn-logout-mobile" aria-label="Sair">
           <i class="bi bi-box-arrow-right"></i>
         </button>
+        <div id="topbar-avatar" class="user-avatar-initial" aria-label="Usuário" title="">?</div>
       </div>
     </div>
 
@@ -258,10 +302,82 @@
 
       <!-- Dashboard (contexto geral) -->
       <div id="dashboard" class="tela ativa">
-        <div class="dash-hero" id="dash-hero"></div>
-        <div class="card">
-          <div class="card-title">Meus campeonatos</div>
-          <div id="dash-lista-campeonatos" class="dash-camp-list"></div>
+        <div class="container-fluid py-4">
+
+          <!-- STATS -->
+          <div class="row g-3 mb-4">
+
+            <div class="col-6 col-lg-3">
+              <div class="stats-card" data-aos="fade-up" data-aos-delay="0">
+                <div class="stats-icon"><i class="bi bi-trophy-fill"></i></div>
+                <div>
+                  <h3 id="dash-stat-camps">&mdash;</h3>
+                  <p id="dash-stat-camps-label">Campeonatos</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+              <div class="stats-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="stats-icon"><i class="bi bi-lightning-fill"></i></div>
+                <div>
+                  <h3 id="dash-stat-ativos">&mdash;</h3>
+                  <p>Em andamento</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+              <div class="stats-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="stats-icon"><i class="bi bi-check-circle-fill"></i></div>
+                <div>
+                  <h3 id="dash-stat-enc">&mdash;</h3>
+                  <p>Finalizados</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+              <div class="stats-card" data-aos="fade-up" data-aos-delay="300">
+                <div class="stats-icon"><i class="bi bi-tags-fill"></i></div>
+                <div>
+                  <h3 id="dash-stat-modal">&mdash;</h3>
+                  <p>Modalidades</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- CONTEÚDO -->
+          <div class="row g-4">
+
+            <!-- PARTIDAS -->
+            <div class="col-lg-8">
+              <div class="app-card" data-aos="fade-up">
+                <div class="section-header">
+                  <h5>Partidas Recentes</h5>
+                  <button class="btn btn-sm btn-success" onclick="document.querySelector('[data-tela=campeonatos]').click()">Ver todas</button>
+                </div>
+                <div id="dash-matches-list">
+                  <div class="dash-empty-msg">Abra um campeonato para ver as partidas.</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CAMPEONATOS -->
+            <div class="col-lg-4">
+              <div class="app-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="section-header">
+                  <h5>Meus Campeonatos</h5>
+                </div>
+                <div class="dash-hero" id="dash-hero"></div>
+                <div id="dash-lista-campeonatos" class="dash-camp-list"></div>
+              </div>
+            </div>
+
+          </div>
+
         </div>
       </div>
 
@@ -278,145 +394,12 @@
         </div>
 
         <!-- FAB novo campeonato -->
-        <button class="camp-fab" id="btn-novo-campeonato" aria-label="Novo campeonato">
+        <button class="camp-fab" id="btn-novo-campeonato" aria-label="Novo campeonato"
+                data-bs-toggle="modal" data-bs-target="#modalCampeonato">
           <i class="bi bi-plus-lg"></i>
         </button>
 
-        <!-- Painel de cria&ccedil;&atilde;o (slide-in) -->
-        <div class="camp-create-panel" id="camp-create-panel" aria-hidden="true">
 
-          <div class="camp-create-header">
-            <button class="camp-create-back" id="btn-fechar-criar" aria-label="Voltar">
-              <i class="bi bi-arrow-left"></i>
-            </button>
-            <span class="camp-create-title">Novo campeonato</span>
-          </div>
-
-          <div class="camp-create-body">
-
-            <!-- Nome -->
-            <div class="cc-hero-field">
-              <input class="cc-hero-input" id="nomeCampeonato"
-                     placeholder="Nome do campeonato" autocomplete="off">
-            </div>
-
-            <!-- Esporte -->
-            <div class="cc-section">
-              <div class="cc-section-label">Esporte</div>
-              <div class="cc-pills" id="modalidade-pills">
-                <button type="button" class="cc-pill" data-value="Futebol">Futebol</button>
-                <button type="button" class="cc-pill" data-value="Futsal">Futsal</button>
-                <button type="button" class="cc-pill" data-value="Fut7">Fut7</button>
-                <button type="button" class="cc-pill" data-value="Basquete">Basquete</button>
-                <button type="button" class="cc-pill" data-value="V&ocirc;lei">V&ocirc;lei</button>
-                <button type="button" class="cc-pill" data-value="Handebol">Handebol</button>
-                <button type="button" class="cc-pill" data-value="H&oacute;quei">H&oacute;quei</button>
-                <button type="button" class="cc-pill" data-value="Outro">Outro</button>
-              </div>
-            </div>
-
-            <!-- Formato -->
-            <div class="cc-section">
-              <div class="cc-section-label">Formato</div>
-              <div class="cc-pills" id="formato-pills">
-                <button type="button" class="cc-pill" data-value="Liga">
-                  <i class="bi bi-table"></i> Liga
-                </button>
-                <button type="button" class="cc-pill" data-value="Eliminat&oacute;rias">
-                  <i class="bi bi-diagram-3"></i> Eliminat&oacute;rias
-                </button>
-                <button type="button" class="cc-pill" data-value="Grupos">
-                  <i class="bi bi-grid-3x3-gap"></i> Grupos
-                </button>
-              </div>
-              <div class="cc-hint" id="formato-hint"></div>
-            </div>
-
-            <!-- Fase inicial das eliminat&oacute;rias (mata-mata) -->
-            <div class="cc-section hidden" id="copa-fase-inicial-section">
-              <div class="cc-section-label">Come&ccedil;ar nas&hellip;</div>
-              <div class="cc-pills" id="fase-inicial-pills">
-                <button type="button" class="cc-pill" data-value="oitavas">
-                  <i class="bi bi-trophy"></i> Oitavas de final
-                </button>
-                <button type="button" class="cc-pill" data-value="quartas">
-                  <i class="bi bi-trophy"></i> Quartas de final
-                </button>
-                <button type="button" class="cc-pill" data-value="semifinal">
-                  <i class="bi bi-trophy"></i> Semifinal
-                </button>
-              </div>
-              <div class="cc-hint">Mata-mata direto, com disputa de 3&ordm; lugar.</div>
-            </div>
-
-            <!-- Categoria -->
-            <div class="cc-section">
-              <div class="cc-section-label">Categoria</div>
-              <div class="cc-pills" id="categoria-pills">
-                <button type="button" class="cc-pill" data-value="Livre">Livre</button>
-                <button type="button" class="cc-pill" data-value="Profissional">Profissional</button>
-                <button type="button" class="cc-pill" data-value="Feminino">Feminino</button>
-                <button type="button" class="cc-pill" data-value="Misto">Misto</button>
-                <button type="button" class="cc-pill cc-pill-sub" id="pill-sub-custom">
-                  <i class="bi bi-person-badge"></i>&nbsp;Sub&hellip;
-                </button>
-              </div>
-              <div class="cc-sub-wrap" id="cc-sub-wrap">
-                <span class="cc-sub-prefix">Sub-</span>
-                <input type="number" id="subIdade" class="cc-sub-input"
-                       min="5" max="23" placeholder="17">
-                <span class="cc-sub-anos">anos</span>
-              </div>
-            </div>
-
-            <!-- Configura&ccedil;&otilde;es -->
-            <div class="cc-section">
-              <div class="cc-section-label">Configura&ccedil;&otilde;es</div>
-              <div class="cc-config-list">
-                <div class="cc-config-item">
-                  <span class="cc-config-label">Dura&ccedil;&atilde;o por tempo</span>
-                  <select class="cc-config-select" id="duracaoPadrao">
-                    <option value="45">45 min</option>
-                    <option value="20">20 min</option>
-                    <option value="10">10 min</option>
-                    <option value="15">15 min</option>
-                    <option value="30">30 min</option>
-                  </select>
-                </div>
-                <div class="cc-config-item">
-                  <span class="cc-config-label">Pontos por vit&oacute;ria</span>
-                  <select class="cc-config-select" id="pontosVitoria">
-                    <option value="3">3 pontos</option>
-                    <option value="2">2 pontos</option>
-                  </select>
-                </div>
-                <div class="cc-config-item">
-                  <span class="cc-config-label">Ida e volta</span>
-                  <div class="config-row-toggle" id="toggle-ida-volta-wrap">
-                    <div class="toggle-pill"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Descri&ccedil;&atilde;o -->
-            <div class="cc-section">
-              <div class="cc-section-label">
-                Descri&ccedil;&atilde;o
-                <span class="cc-label-opt">(opcional)</span>
-              </div>
-              <input class="cc-input" id="descricaoCampeonato"
-                     placeholder="Regras, premia&ccedil;&atilde;o, detalhes&hellip;" autocomplete="off">
-            </div>
-
-          </div><!-- /.camp-create-body -->
-
-          <div class="camp-create-footer">
-            <button class="btn-primary" id="btn-criar-campeonato"
-                    style="width:100%">Criar campeonato</button>
-          </div>
-
-        </div><!-- /.camp-create-panel -->
 
       </div>
 
@@ -602,22 +585,6 @@
       <!-- Configurações -->
       <div id="configuracoes" class="tela">
 
-        <!-- Aparência -->
-        <div class="config-section">
-          <div class="config-section-title">Apar&ecirc;ncia</div>
-          <div class="config-list">
-            <div class="config-row" id="config-tema-row">
-              <div class="config-row-icon"><i class="bi bi-moon-stars-fill"></i></div>
-              <div class="config-row-body">
-                <div class="config-row-label">Tema escuro</div>
-              </div>
-              <button class="config-row-toggle" id="config-tema-toggle" aria-label="Alternar tema">
-                <div class="toggle-pill"></div>
-              </button>
-            </div>
-          </div>
-        </div>
-
         <!-- Conta -->
         <div class="config-section">
           <div class="config-section-title">Conta</div>
@@ -640,13 +607,6 @@
               <div class="config-row-icon"><i class="bi bi-box-arrow-right"></i></div>
               <div class="config-row-body">
                 <div class="config-row-label">Sair da conta</div>
-              </div>
-            </div>
-            <div class="config-row config-row-danger" id="config-btn-excluir-conta">
-              <div class="config-row-icon"><i class="bi bi-trash3"></i></div>
-              <div class="config-row-body">
-                <div class="config-row-label">Excluir conta</div>
-                <div class="config-row-sub">Remove permanentemente sua conta e dados</div>
               </div>
             </div>
           </div>
@@ -868,9 +828,6 @@
     <button class="bottom-nav-item ctx-camp" data-tela="classificacao">
       <i class="bi bi-list-ol"></i><span>Classif.</span>
     </button>
-    <button class="bottom-nav-item ctx-camp" data-tela="estatisticas">
-      <i class="bi bi-graph-up-arrow"></i><span>Stats</span>
-    </button>
     <button class="bottom-nav-item ctx-camp" id="btn-mais-camp" aria-label="Mais opções">
       <i class="bi bi-grid-3x3-gap-fill"></i><span>Mais</span>
     </button>
@@ -898,54 +855,292 @@
     </div>
   </div>
 
-  <!-- ── MODAL PAGAMENTO CAMPEONATO ──────────────────────────── -->
-  <div id="modal-pagamento" class="modal">
-    <div class="modal-box modal-pag-box">
-      <button class="modal-close" id="btn-fechar-pagamento">&#x2715;</button>
+  <!-- ── MODAL CRIAR CAMPEONATO ────────────────────────────────── -->
+  <div class="modal fade" id="modalCampeonato" tabindex="-1" aria-labelledby="modalCampeonatoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content custom-modal">
 
-      <div class="modal-pag-header">
-        <i class="bi bi-trophy-fill modal-pag-icon"></i>
-        <div class="modal-pag-title">Criar campeonato</div>
-        <div class="modal-pag-sub">Escolha o tipo e confirme</div>
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title" id="modalCampeonatoLabel">
+            <i class="bi bi-trophy-fill me-2" style="color:var(--accent)"></i>Novo Campeonato
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+
+        <div class="modal-body pt-3">
+          <form id="formCampeonato" novalidate>
+
+            <div class="mb-3">
+              <label class="form-label">Nome <span class="text-danger">*</span></label>
+              <input type="text" class="form-control custom-input" name="nome"
+                     placeholder="Ex: Copa Verão 2026" required autocomplete="off">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Modalidade <span class="text-danger">*</span></label>
+              <select class="form-select custom-input" name="modalidade" required>
+                <option value="" disabled selected>Selecione o esporte</option>
+                <option value="Futebol">Futebol</option>
+                <option value="Futsal">Futsal</option>
+                <option value="Fut7">Fut7</option>
+                <option value="Basquete">Basquete</option>
+                <option value="Vôlei">Vôlei</option>
+                <option value="Handebol">Handebol</option>
+                <option value="Hóquei">Hóquei</option>
+                <option value="Outro">Outro</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Formato</label>
+              <select class="form-select custom-input" name="formato">
+                <option value="">Não definido</option>
+                <option value="Liga">Liga (todos contra todos)</option>
+                <option value="Eliminatórias">Mata-mata (eliminatórias)</option>
+                <option value="Grupos">Grupos + mata-mata</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Descrição <span class="text-muted" style="font-size:.8rem">(opcional)</span></label>
+              <textarea class="form-control custom-input" name="descricao" rows="2"
+                        placeholder="Regras, premiação, detalhes…"></textarea>
+            </div>
+
+            <button type="submit" class="btn-login w-100 mt-2">
+              <i class="bi bi-plus-circle-fill me-1"></i> Criar Campeonato
+            </button>
+
+          </form>
+        </div>
+
       </div>
+    </div>
+  </div>
 
-      <div class="modal-pag-opcoes">
-        <label class="pag-opcao">
-          <input type="radio" name="pag-tipo" value="basico" checked>
-          <div class="pag-opcao-body">
-            <div class="pag-opcao-nome">B&aacute;sico</div>
-            <div class="pag-opcao-desc">At&eacute; 8 times &middot; liga simples</div>
-          </div>
-          <div class="pag-opcao-preco">R$&nbsp;5</div>
-          <div class="pag-opcao-check"><i class="bi bi-check-circle-fill"></i></div>
-        </label>
-        <label class="pag-opcao">
-          <input type="radio" name="pag-tipo" value="pro">
-          <div class="pag-opcao-body">
-            <div class="pag-opcao-nome">Pro <span class="pag-badge-rec">Popular</span></div>
-            <div class="pag-opcao-desc">Times ilimitados &middot; todos os formatos</div>
-          </div>
-          <div class="pag-opcao-preco">R$&nbsp;10</div>
-          <div class="pag-opcao-check"><i class="bi bi-check-circle-fill"></i></div>
-        </label>
-      </div>
+  <!-- ── TOAST ────────────────────────────────────────────────────────── -->
+  <div id="app-toast" class="custom-toast"></div>
 
-      <div class="modal-pag-metodo">
-        <div class="modal-pag-metodo-label">Forma de pagamento</div>
-        <div class="pag-metodos">
-          <label class="pag-metodo-item">
-            <input type="radio" name="pag-metodo" value="pix" checked>
-            <i class="bi bi-qr-code"></i> Pix
-          </label>
-          <label class="pag-metodo-item">
-            <input type="radio" name="pag-metodo" value="cartao">
-            <i class="bi bi-credit-card"></i> Cart&atilde;o
-          </label>
+  <!-- ── MODAL PERFIL DO USUÁRIO ───────────────────────────────────────── -->
+  <div class="modal fade" id="modalPerfil" tabindex="-1" aria-labelledby="modalPerfilLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered perfil-dialog">
+      <div class="modal-content custom-modal perfil-modal">
+
+        <!-- ─ Hero ─ -->
+        <div class="perfil-hero-header">
+          <div class="perfil-avatar-wrap">
+            <div class="perfil-avatar-lg" id="perfil-avatar-lg">?</div>
+            <button type="button" class="perfil-avatar-edit-btn" id="perfil-avatar-edit-btn"
+                    title="Editar foto" aria-label="Editar foto do perfil">
+              <i class="bi bi-pencil-fill"></i>
+            </button>
+          </div>
+          <div class="perfil-hero-info">
+            <div class="perfil-hero-nome" id="perfil-hero-nome">—</div>
+            <div class="perfil-hero-email" id="perfil-hero-email">—</div>
+            <div class="perfil-badges">
+              <span class="perfil-provider-badge" id="perfil-provider-badge"></span>
+              <span class="perfil-plano-badge" id="perfil-plano-badge"></span>
+            </div>
+          </div>
+          <button type="button" class="btn-close perfil-close"
+                  data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+
+        <!-- ─ Tabs ─ -->
+        <div class="perfil-tab-nav">
+          <button class="perfil-tab ativo" data-tab="tab-dados">
+            <i class="bi bi-person-fill"></i><span>Perfil</span>
+          </button>
+          <button class="perfil-tab" data-tab="tab-seguranca">
+            <i class="bi bi-shield-lock-fill"></i><span>Segurança</span>
+          </button>
+          <button class="perfil-tab" data-tab="tab-conta">
+            <i class="bi bi-gear-fill"></i><span>Conta</span>
+          </button>
+        </div>
+
+        <div class="modal-body perfil-body">
+
+          <!-- TAB: PERFIL -->
+          <div id="tab-dados" class="perfil-pane">
+            <form id="formPerfil" novalidate>
+
+              <!-- Foto do perfil -->
+              <input type="file" id="perfil-input-foto-file" accept="image/*" style="display:none">
+              <input type="hidden" id="perfil-input-foto" name="foto_url">
+              <div class="mb-3" id="perfil-foto-section" style="display:none">
+                <label class="perfil-label">Foto do perfil</label>
+                <div class="perfil-foto-row">
+                  <div class="perfil-foto-thumb" id="perfil-foto-thumb">?</div>
+                  <div class="perfil-foto-input-wrap">
+                    <div class="perfil-foto-actions">
+                      <button type="button" class="perfil-foto-btn-escolher" id="btn-escolher-foto-perfil">
+                        <i class="bi bi-folder2-open me-1"></i>Escolher arquivo
+                      </button>
+                      <button type="button" class="perfil-foto-btn-remover" id="btn-remover-foto-perfil" style="display:none">
+                        <i class="bi bi-trash me-1"></i>Remover
+                      </button>
+                    </div>
+                    <small id="perfil-foto-nome" style="display:none"></small>
+                    <small>JPG, PNG ou WebP &bull; m&aacute;x. 3 MB</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Nome -->
+              <div class="mb-3">
+                <label class="perfil-label" for="perfil-input-nome">Nome de exibição</label>
+                <input type="text" class="form-control custom-input" id="perfil-input-nome"
+                       name="nome" maxlength="120" placeholder="Como quer ser chamado?" autocomplete="off">
+              </div>
+
+              <!-- Email -->
+              <div class="mb-3">
+                <label class="perfil-label">E-mail</label>
+                <div class="perfil-email-row">
+                  <i class="bi bi-envelope-fill"></i>
+                  <span id="perfil-disp-email">—</span>
+                </div>
+                <div class="perfil-hint">O e-mail não pode ser alterado.</div>
+              </div>
+
+              <!-- Infos extras -->
+              <div class="perfil-info-grid mb-3">
+                <div class="perfil-info-item">
+                  <i class="bi bi-calendar3"></i>
+                  <span class="perfil-info-key">Membro desde</span>
+                  <span class="perfil-info-val" id="perfil-membro-desde">—</span>
+                </div>
+                <div class="perfil-info-item">
+                  <i class="bi bi-shield-check"></i>
+                  <span class="perfil-info-key">Tipo de login</span>
+                  <span class="perfil-info-val" id="perfil-tipo-conta">—</span>
+                </div>
+                <div class="perfil-info-item">
+                  <i class="bi bi-person-badge"></i>
+                  <span class="perfil-info-key">ID da conta</span>
+                  <span class="perfil-info-val" id="perfil-id-conta" style="font-size:.75rem">—</span>
+                </div>
+              </div>
+
+              <div id="perfil-erro" class="perfil-msg perfil-msg--erro mt-2" style="display:none"></div>
+              <button type="submit" id="perfil-btn-salvar" class="btn-login w-100 mt-3">
+                <i class="bi bi-check-lg me-1"></i>Salvar alterações
+              </button>
+            </form>
+          </div>
+
+          <!-- TAB: SEGURANÇA -->
+          <div id="tab-seguranca" class="perfil-pane" style="display:none">
+
+            <div id="sec-email-section">
+              <p class="perfil-section-hint mb-3">
+                <i class="bi bi-info-circle me-1"></i>
+                Use uma senha forte com letras, números e pelo menos 8 caracteres.
+              </p>
+              <form id="formSenha" novalidate autocomplete="off">
+                <div class="mb-3">
+                  <label class="perfil-label" for="senha-atual">Senha atual</label>
+                  <input type="password" class="form-control custom-input" id="senha-atual"
+                         name="senha_atual" placeholder="••••••••" autocomplete="current-password">
+                </div>
+                <div class="mb-3">
+                  <label class="perfil-label" for="senha-nova">Nova senha</label>
+                  <input type="password" class="form-control custom-input" id="senha-nova"
+                         name="senha_nova" placeholder="••••••••" autocomplete="new-password">
+                </div>
+                <div class="mb-3">
+                  <label class="perfil-label" for="senha-confirma">Confirmar nova senha</label>
+                  <input type="password" class="form-control custom-input" id="senha-confirma"
+                         name="senha_confirma" placeholder="••••••••" autocomplete="new-password">
+                </div>
+                <div id="senha-erro" class="perfil-msg perfil-msg--erro" style="display:none"></div>
+                <div id="senha-ok"   class="perfil-msg perfil-msg--ok"   style="display:none">
+                  <i class="bi bi-check-circle-fill me-1"></i>Senha alterada com sucesso!
+                </div>
+                <button type="submit" id="senha-btn-salvar" class="btn-login w-100">
+                  <i class="bi bi-lock-fill me-1"></i>Alterar senha
+                </button>
+              </form>
+            </div>
+
+            <div id="sec-google-section" style="display:none">
+              <div class="perfil-google-card">
+                <i class="bi bi-google"></i>
+                <div>
+                  <div class="perfil-google-title">Conta Google</div>
+                  <div class="perfil-section-hint">Sua conta usa autenticação pelo Google. Para alterar sua senha, acesse as configurações da sua Conta Google.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB: CONTA -->
+          <div id="tab-conta" class="perfil-pane" style="display:none">
+
+            <!-- Plano info -->
+            <div class="perfil-plano-card" id="perfil-plano-card">
+              <i class="bi bi-star-fill"></i>
+              <div class="perfil-plano-card-body">
+                <div class="perfil-plano-card-title" id="perfil-plano-titulo">Plano gratuito</div>
+                <div class="perfil-plano-card-sub"   id="perfil-plano-sub">Sem campeonatos ilimitados</div>
+              </div>
+            </div>
+
+            <!-- Stats 2×2 -->
+            <div class="perfil-stats-row mb-3">
+              <div class="perfil-stat-box">
+                <i class="bi bi-trophy perfil-stat-icon"></i>
+                <span class="perfil-stat-num" id="pstat-camps">—</span>
+                <span class="perfil-stat-lbl">Campeonatos</span>
+              </div>
+              <div class="perfil-stat-box">
+                <i class="bi bi-people perfil-stat-icon"></i>
+                <span class="perfil-stat-num" id="pstat-times">—</span>
+                <span class="perfil-stat-lbl">Times</span>
+              </div>
+              <div class="perfil-stat-box">
+                <i class="bi bi-controller perfil-stat-icon"></i>
+                <span class="perfil-stat-num" id="pstat-jogos">—</span>
+                <span class="perfil-stat-lbl">Jogos</span>
+              </div>
+              <div class="perfil-stat-box">
+                <i class="bi bi-calendar-check perfil-stat-icon"></i>
+                <span class="perfil-stat-num" id="pstat-dias">—</span>
+                <span class="perfil-stat-lbl">Dias no app</span>
+              </div>
+            </div>
+
+            <!-- Toggle de tema -->
+            <div class="perfil-theme-row" id="perfil-theme-row">
+              <div class="perfil-theme-row-label">
+                <i class="bi bi-moon-stars-fill" id="perfil-theme-icon"></i>
+                <div>
+                  <div>Aparência</div>
+                  <div class="perfil-theme-sub" id="perfil-theme-sub">Modo escuro ativo</div>
+                </div>
+              </div>
+              <div class="perfil-theme-pill" id="perfil-theme-pill"></div>
+            </div>
+
+            <!-- Danger zone -->
+            <div class="perfil-danger-zone">
+              <div class="perfil-danger-title">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i>Zona de perigo
+              </div>
+              <p class="perfil-danger-text">
+                A exclusão da conta é <strong>permanente</strong> e remove todos os seus campeonatos e dados.
+              </p>
+              <button id="perfil-btn-excluir" class="perfil-btn-danger w-100">
+                <i class="bi bi-trash3-fill me-1"></i>Excluir minha conta
+              </button>
+            </div>
+
+          </div>
+
         </div>
       </div>
-
-      <button class="btn-primary" id="btn-confirmar-pagamento"
-              style="width:100%;margin-top:4px">Confirmar e criar</button>
     </div>
   </div>
 
@@ -1033,6 +1228,20 @@
     </div>
   </div>
 
+
+  <!-- ── VISUALIZADOR DE FOTO ──────────────────────────────────────────── -->
+  <div id="foto-viewer" class="foto-viewer-overlay" style="display:none"
+       role="dialog" aria-modal="true" aria-label="Visualizar foto">
+    <button class="foto-viewer-close" id="foto-viewer-close" aria-label="Fechar visualizador">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <img class="foto-viewer-img" id="foto-viewer-img" alt="Foto ampliada">
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>AOS.init({ duration: 700, once: true });</script>
+  <script src="/assets/js/main.js"></script>
   <script type="module" src="app.js"></script>
 </body>
 </html>

@@ -2,6 +2,7 @@
 import { getTimes, getJogos, getClassificacao, updateCampeonatoImagem } from "../services/api.js";
 import { getCampeonatoAtual, setCampeonatoAtual } from "../store.js";
 import { abrir as abrirModal } from "../components/modal.js";
+import { notificar } from "../components/ui.js";
 
 const SPORT_EMOJI = {
   futebol: "⚽", futsal: "⚽", basquete: "🏀",
@@ -47,6 +48,24 @@ function _initListeners() {
     e.target.value = "";
   });
 
+  // Logo → clicar para visualizar em tela cheia
+  document.getElementById("ov-avatar")?.addEventListener("click", e => {
+    if (e.target.closest("#btn-trocar-logo")) return;
+    const img = document.getElementById("ov-avatar-img");
+    if (img && !img.classList.contains("hidden") && img.src) {
+      document.dispatchEvent(new CustomEvent("disputaapp:view-foto", { detail: { url: img.src } }));
+    }
+  });
+
+  // Capa → clicar para visualizar em tela cheia (exceto botão de editar)
+  document.getElementById("ov-cover")?.addEventListener("click", e => {
+    if (e.target.closest("#btn-trocar-capa")) return;
+    const camp = getCampeonatoAtual();
+    if (camp?.capa_url) {
+      document.dispatchEvent(new CustomEvent("disputaapp:view-foto", { detail: { url: camp.capa_url } }));
+    }
+  });
+
   // Clique nos match cards → abre modal do jogo
   document.addEventListener("click", e => {
     const m = e.target.closest(".ov-match[data-id]");
@@ -61,7 +80,7 @@ function _initListeners() {
 async function _handleImageUpload(file, tipo) {
   if (!file.type.startsWith("image/")) return;
   if (file.size > 3 * 1024 * 1024) {
-    alert("Imagem muito grande. Máximo 3 MB.");
+    notificar("Imagem muito grande. Máximo 3 MB.");
     return;
   }
 
@@ -82,9 +101,12 @@ async function _handleImageUpload(file, tipo) {
       if (tipo === "capa") updated.capa_url = base64;
       else                 updated.logo_url = base64;
       setCampeonatoAtual(updated);
+      notificar(tipo === "capa" ? "Capa atualizada!" : "Logo atualizado!", "sucesso");
     } catch (err) {
       console.error("Erro ao salvar imagem:", err);
-      alert("Não foi possível salvar a imagem. Tente novamente.");
+      // Reverte visual em caso de erro
+      _applyImage(tipo, tipo === "capa" ? (camp.capa_url || null) : (camp.logo_url || null), camp);
+      notificar("Não foi possível salvar a imagem. Tente novamente.");
     }
   };
   reader.readAsDataURL(file);
@@ -93,14 +115,19 @@ async function _handleImageUpload(file, tipo) {
 function _applyImage(tipo, url, camp) {
   if (tipo === "capa") {
     const cover = document.getElementById("ov-cover");
-    if (cover) cover.style.backgroundImage = `url(${url})`;
+    if (cover) {
+      cover.style.backgroundImage = `url("${url}")`;
+      cover.classList.add("foto-viewer-trigger");
+    }
   } else {
-    const img   = document.getElementById("ov-avatar-img");
-    const emoji = document.getElementById("ov-avatar-emoji");
+    const img     = document.getElementById("ov-avatar-img");
+    const emoji   = document.getElementById("ov-avatar-emoji");
+    const wrapper = document.getElementById("ov-avatar");
     if (img && emoji) {
       img.src = url;
       img.classList.remove("hidden");
       emoji.classList.add("hidden");
+      wrapper?.classList.add("foto-viewer-trigger");
     }
   }
 }
@@ -145,24 +172,29 @@ function _renderProfile(camp, jogos) {
   const cover = document.getElementById("ov-cover");
   if (cover) {
     if (camp.capa_url) {
-      cover.style.backgroundImage = `url(${camp.capa_url})`;
+      cover.style.backgroundImage = `url("${camp.capa_url}")`;
+      cover.classList.add("foto-viewer-trigger");
     } else {
       cover.style.backgroundImage = "";
+      cover.classList.remove("foto-viewer-trigger");
     }
   }
 
   // Avatar / logo
   const avatarImg   = document.getElementById("ov-avatar-img");
   const avatarEmoji = document.getElementById("ov-avatar-emoji");
+  const avatarWrap  = document.getElementById("ov-avatar");
   if (avatarImg && avatarEmoji) {
     if (camp.logo_url) {
       avatarImg.src = camp.logo_url;
       avatarImg.classList.remove("hidden");
       avatarEmoji.classList.add("hidden");
+      avatarWrap?.classList.add("foto-viewer-trigger");
     } else {
       avatarImg.classList.add("hidden");
       avatarEmoji.classList.remove("hidden");
       avatarEmoji.textContent = emoji;
+      avatarWrap?.classList.remove("foto-viewer-trigger");
     }
   }
 

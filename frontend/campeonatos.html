@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Campeonatos &bull; Disputa App</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="champ-body">
+
+  <div class="app-container">
+
+    <!-- HEADER -->
+    <header class="champ-page-header d-flex justify-content-between align-items-center">
+      <div>
+        <h5 class="mb-0 fw-bold">Campeonatos</h5>
+        <small>Gerencie seus campeonatos</small>
+      </div>
+      <button class="btn-app">+ Novo</button>
+    </header>
+
+    <!-- CONTEÚDO -->
+    <main class="container-fluid py-4">
+      <div class="row g-4">
+
+        <div class="col-md-6 col-lg-4">
+          <div class="champ-card" data-aos="fade-up">
+            <div class="champ-header">
+              <span class="badge bg-success">Ativo</span>
+              <i class="bi bi-three-dots"></i>
+            </div>
+            <h5>Copa dos Amigos</h5>
+            <p>Formato: Liga</p>
+            <div class="champ-stats">
+              <div><strong>12</strong><span>Jogos</span></div>
+              <div><strong>6</strong><span>Times</span></div>
+              <div><strong>3ª</strong><span>Rodada</span></div>
+            </div>
+            <div class="champ-actions">
+              <button class="btn btn-sm btn-outline-light">Ver</button>
+              <button class="btn btn-sm btn-success">Gerenciar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+          <div class="champ-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="champ-header">
+              <span class="badge bg-warning text-dark">Aguardando</span>
+              <i class="bi bi-three-dots"></i>
+            </div>
+            <h5>Torneio Verão 2025</h5>
+            <p>Formato: Eliminatórias</p>
+            <div class="champ-stats">
+              <div><strong>0</strong><span>Jogos</span></div>
+              <div><strong>8</strong><span>Times</span></div>
+              <div><strong>—</strong><span>Rodada</span></div>
+            </div>
+            <div class="champ-actions">
+              <button class="btn btn-sm btn-outline-light">Ver</button>
+              <button class="btn btn-sm btn-success">Gerenciar</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6 col-lg-4">
+          <div class="champ-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="champ-header">
+              <span class="badge bg-secondary">Encerrado</span>
+              <i class="bi bi-three-dots"></i>
+            </div>
+            <h5>Liga Municipal 2024</h5>
+            <p>Formato: Pontos corridos</p>
+            <div class="champ-stats">
+              <div><strong>38</strong><span>Jogos</span></div>
+              <div><strong>10</strong><span>Times</span></div>
+              <div><strong>Final</strong><span>Rodada</span></div>
+            </div>
+            <div class="champ-actions">
+              <button class="btn btn-sm btn-outline-light">Ver</button>
+              <button class="btn btn-sm btn-success">Gerenciar</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+
+  <!-- FAB -->
+  <button class="fab-button" title="Novo campeonato">
+    <i class="bi bi-plus"></i>
+  </button>
+
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>AOS.init({ duration: 700, once: true });</script>
+
+</body>
+</html>

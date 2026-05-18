@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ranking &bull; Disputa App</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+<body class="ranking-body">
+
+  <div class="app-container">
+
+    <!-- HEADER -->
+    <header class="champ-page-header d-flex justify-content-between align-items-center">
+      <div>
+        <h5 class="mb-0 fw-bold">Ranking</h5>
+        <small>Classificação geral</small>
+      </div>
+      <div class="d-flex gap-2">
+        <select class="ranking-filter">
+          <option>Geral</option>
+          <option>Mensal</option>
+          <option>Por campeonato</option>
+        </select>
+      </div>
+    </header>
+
+    <main class="container py-4">
+
+      <!-- TOP 3 -->
+      <div class="top-ranking" data-aos="fade-up">
+
+        <!-- 2º -->
+        <div class="top-player second">
+          <img src="https://i.pravatar.cc/100?img=2" alt="Carlos">
+          <span class="position">2</span>
+          <strong>Carlos</strong>
+          <small>10 vitórias</small>
+        </div>
+
+        <!-- 1º -->
+        <div class="top-player first">
+          <div class="crown"><i class="bi bi-crown-fill"></i></div>
+          <img src="https://i.pravatar.cc/100?img=1" alt="João">
+          <span class="position">1</span>
+          <strong>João</strong>
+          <small>12 vitórias</small>
+        </div>
+
+        <!-- 3º -->
+        <div class="top-player third">
+          <img src="https://i.pravatar.cc/100?img=3" alt="Pedro">
+          <span class="position">3</span>
+          <strong>Pedro</strong>
+          <small>8 vitórias</small>
+        </div>
+
+      </div>
+
+      <!-- LISTA -->
+      <div class="app-card ranking-card mt-4">
+        <div class="ranking-list">
+
+          <div class="ranking-row" data-aos="fade-left" data-aos-delay="0">
+            <span class="ranking-pos">#4</span>
+            <div class="ranking-user">
+              <img src="https://i.pravatar.cc/100?img=4" alt="Lucas">
+              <div>
+                <strong>Lucas</strong>
+                <small>7 vitórias</small>
+              </div>
+            </div>
+            <span class="points">21 pts</span>
+          </div>
+
+          <div class="ranking-row" data-aos="fade-left" data-aos-delay="80">
+            <span class="ranking-pos">#5</span>
+            <div class="ranking-user">
+              <img src="https://i.pravatar.cc/100?img=5" alt="Rafael">
+              <div>
+                <strong>Rafael</strong>
+                <small>6 vitórias</small>
+              </div>
+            </div>
+            <span class="points">18 pts</span>
+          </div>
+
+          <div class="ranking-row" data-aos="fade-left" data-aos-delay="160">
+            <span class="ranking-pos">#6</span>
+            <div class="ranking-user">
+              <img src="https://i.pravatar.cc/100?img=6" alt="Marcos">
+              <div>
+                <strong>Marcos</strong>
+                <small>5 vitórias</small>
+              </div>
+            </div>
+            <span class="points">15 pts</span>
+          </div>
+
+          <div class="ranking-row" data-aos="fade-left" data-aos-delay="240">
+            <span class="ranking-pos">#7</span>
+            <div class="ranking-user">
+              <img src="https://i.pravatar.cc/100?img=7" alt="Bruno">
+              <div>
+                <strong>Bruno</strong>
+                <small>4 vitórias</small>
+              </div>
+            </div>
+            <span class="points">12 pts</span>
+          </div>
+
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>AOS.init({ duration: 700, once: true });</script>
+
+</body>
+</html>

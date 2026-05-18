@@ -74,9 +74,23 @@ function _renderHero() {
     </div>`;
 }
 
+function _renderStats() {
+  const total   = _campeonatos.length;
+  const ativos  = _campeonatos.filter(c => c.status === "em_andamento").length;
+  const enc     = _campeonatos.filter(c => c.status === "finalizado").length;
+  const modais  = new Set(_campeonatos.map(c => (c.modalidade || "").toLowerCase()).filter(Boolean)).size;
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set("dash-stat-camps",  total  || "0");
+  set("dash-stat-ativos", ativos || "0");
+  set("dash-stat-enc",    enc    || "0");
+  set("dash-stat-modal",  modais || "0");
+}
+
 function _render() {
   const el = document.getElementById("dash-lista-campeonatos");
   if (!el) return;
+  _renderStats();
   _renderHero();
 
   if (!_campeonatos.length) {

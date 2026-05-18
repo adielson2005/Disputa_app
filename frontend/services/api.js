@@ -27,10 +27,12 @@ async function _req(method, path, body = null, auth = false) {
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
-export const login         = (email, senha) => _req("POST",   "/login",    { email, senha });
-export const register      = (email, senha) => _req("POST",   "/register", { email, senha });
-export const loginGoogle   = (credential)   => _req("POST",   "/auth/google", { credential });
-export const deleteAccount = ()             => _req("DELETE", "/user",     null, true);
+export const login           = (email, senha) => _req("POST",   "/login",        { email, senha });
+export const register        = (email, senha) => _req("POST",   "/register",     { email, senha });
+export const loginGoogle     = (credential)   => _req("POST",   "/auth/google",  { credential });
+export const deleteAccount   = ()             => _req("DELETE", "/user",         null, true);
+export const updateUser      = (data)         => _req("PATCH",  "/user",         data, true);
+export const changePassword  = (data)         => _req("POST",   "/user/senha",   data, true);
 
 // ── Campeonatos ───────────────────────────────────────────────────────────────
 // Sem user_id na URL — o backend usa o token JWT para identificar o usuário
